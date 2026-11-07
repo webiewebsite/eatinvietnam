@@ -10,6 +10,8 @@ import { matchesAllTerms, toStoredSearchText } from '@/lib/search/normalize';
 import { dishLabel, districtLabel, getDish } from '@/lib/taxonomy';
 import type { Photo, Restaurant, SearchFilters } from '@/lib/types';
 
+export const OPEN_TONE_CLASS = { open: 'text-raurau', later: 'text-muted', closed: 'text-danger' } as const;
+
 const PUBLIC = DEMO_RESTAURANTS.filter((r) => r.status === 'verified');
 
 const SEARCH_TEXT = new Map(
@@ -48,6 +50,8 @@ export interface CardData {
   distance: number;
   distanceLabel: string;
   isOpen: boolean;
+  /** open → raurau, later today/tomorrow → muted, closed → danger */
+  openTone: 'open' | 'later' | 'closed';
   openLabel: string;
   highlight: string;
   editorPick: boolean;
@@ -71,6 +75,7 @@ export function toCard(hit: RestaurantHit): CardData {
     distance: hit.distance,
     distanceLabel: formatDistance(hit.distance),
     isOpen: hit.state.open,
+    openTone: hit.state.open ? 'open' : hit.state.opensAt ? 'later' : 'closed',
     openLabel: openLabel(hit.state),
     highlight: r.highlight,
     editorPick: r.editorPick,

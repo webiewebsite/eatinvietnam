@@ -10,7 +10,7 @@ export function CategoryRail() {
     <section aria-label="Món ăn">
       <ul
         id={railId}
-        className="no-scrollbar -mx-4 grid snap-x snap-mandatory auto-cols-[70px] grid-flow-col grid-rows-2 gap-x-0.5 gap-y-3 overflow-x-auto px-3 scroll-px-3"
+        className="no-scrollbar relative -mx-4 grid snap-x snap-mandatory auto-cols-[70px] grid-flow-col grid-rows-2 gap-x-0.5 gap-y-3 overflow-x-auto px-3 scroll-px-3"
       >
         {DISHES.map((d) => (
           <li key={d.slug} className="snap-start">

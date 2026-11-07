@@ -29,7 +29,7 @@ const TONE: Record<string, string> = {
  * Banner carousel: CSS scroll-snap, next slide peeks, dots follow the visible slide.
  * Slide 1 is always the map. No autoplay (it slides away while people read).
  */
-export function PromoCarousel({ slides, openCount }: { slides: PromoSlide[]; openCount: number }) {
+export function PromoCarousel({ slides, openCount, total }: { slides: PromoSlide[]; openCount: number; total: number }) {
   const track_ = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const total = slides.length + 1;
@@ -60,7 +60,7 @@ export function PromoCarousel({ slides, openCount }: { slides: PromoSlide[]; ope
         <Link
           href="/ban-do"
           data-index={0}
-          aria-label={`Bản đồ món ngon, ${openCount} quán đang mở. Mở bản đồ`}
+          aria-label={`Bản đồ món ngon, ${openCount ? `${openCount} quán đang mở` : `${total} quán`}. Mở bản đồ`}
           onClick={() => track('map_open', { source: 'banner' })}
           className="relative flex h-33 w-79 shrink-0 overflow-hidden rounded-card bg-dem text-on-dem"
         >
@@ -68,7 +68,7 @@ export function PromoCarousel({ slides, openCount }: { slides: PromoSlide[]; ope
             <div>
               <span className="inline-flex items-center gap-1 rounded-full bg-raurau px-2 py-0.5 text-badge font-bold text-on-raurau">
                 <span aria-hidden className="size-1.5 rounded-full bg-on-raurau" />
-                {openCount} quán đang mở
+                {openCount ? `${openCount} quán đang mở` : `${total} quán trên bản đồ`}
               </span>
               <p className="mt-1.5 font-display text-[20px] leading-tight font-extrabold">
                 Bản đồ món

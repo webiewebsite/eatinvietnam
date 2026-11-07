@@ -8,7 +8,7 @@ import { RestaurantPhoto } from '@/components/RestaurantPhoto';
 import { SaveButton } from '@/components/SaveButton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { RowSkeleton } from '@/components/ui/Skeleton';
-import type { CardData } from '@/lib/restaurants';
+import { OPEN_TONE_CLASS, type CardData } from '@/lib/restaurants';
 import {
   createList,
   deleteList,
@@ -173,7 +173,7 @@ function ItemList({ items, cards, loading }: { items: SavedItem[]; cards: Record
                     <span className="block truncate font-display text-[15px] font-bold">{c.name}</span>
                     <span className="block text-[12px] text-muted">
                       {c.districtLabel} ·{' '}
-                      <span className={c.isOpen ? 'font-semibold text-raurau' : 'font-semibold text-danger'}>{c.openLabel}</span>
+                      <span className={`font-semibold ${OPEN_TONE_CLASS[c.openTone]}`}>{c.openLabel}</span>
                     </span>
                   </span>
                 </Link>

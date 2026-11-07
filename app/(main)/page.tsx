@@ -8,7 +8,7 @@ import { PromoCarousel } from '@/components/home/PromoCarousel';
 import { TimeSuggest } from '@/components/home/TimeSuggest';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { currentDate } from '@/lib/hours';
-import { countOpen, lateNight, nearby, toCard } from '@/lib/restaurants';
+import { countAll, countOpen, lateNight, nearby, toCard } from '@/lib/restaurants';
 import home from '@content/home.json';
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -40,7 +40,7 @@ function NearMode({ now }: { now: Date }) {
   return (
     <div className="flex flex-col gap-6">
       <CategoryRail />
-      <PromoCarousel slides={home.promos.slice(0, 3)} openCount={countOpen(now)} />
+      <PromoCarousel slides={home.promos.slice(0, 3)} openCount={countOpen(now)} total={countAll()} />
       <TimeSuggest now={now} />
 
       <section aria-labelledby="near">

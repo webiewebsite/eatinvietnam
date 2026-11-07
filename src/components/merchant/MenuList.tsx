@@ -14,7 +14,7 @@ export function MenuList({ items, dish }: { items: MenuItem[]; dish: string }) {
 
   return (
     <div>
-      <div role="group" aria-label="Nhóm món" className="no-scrollbar -mx-3 flex gap-2 overflow-x-auto px-3 py-1">
+      <div role="group" aria-label="Nhóm món" className="no-scrollbar relative -mx-3 flex gap-2 overflow-x-auto px-3 py-1">
         {groups.map((g) => {
           const count = items.filter((i) => i.group === g).length;
           const on = group === g;

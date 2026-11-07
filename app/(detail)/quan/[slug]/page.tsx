@@ -73,7 +73,7 @@ export default async function RestaurantPage({ params }: Props) {
         <ul className="no-scrollbar flex gap-1 overflow-x-auto px-3">
           {TABS.map((t) => (
             <li key={t.id}>
-              <a href={`#${t.id}`} className="inline-flex h-11 items-center px-3 text-[14px] font-semibold text-muted hover:text-ink">
+              <a href={`#${t.id}`} className="inline-flex h-11 items-center px-3 text-[14px] font-semibold whitespace-nowrap text-muted hover:text-ink">
                 {t.label}
                 {t.id === 'anh' && r.photos.length > 0 && <span className="ml-1 text-muted">· {r.photos.length}</span>}
               </a>
@@ -112,9 +112,9 @@ export default async function RestaurantPage({ params }: Props) {
           ) : (
             <p className="mt-2 text-meta text-muted">Quán chưa có thực đơn trên EatInVietnam.</p>
           )}
-          <p className="mt-2 text-[12px] text-muted">
+          <div className="mt-2 text-[12px] text-muted">
             Giá cập nhật {formatDate(r.priceUpdatedAt)} · <ReportIssue slug={r.slug} />
-          </p>
+          </div>
         </section>
 
         <section id="danh-gia" aria-labelledby="rating-title" className="scroll-mt-14">
@@ -191,9 +191,9 @@ export default async function RestaurantPage({ params }: Props) {
               <span className="flex-1 text-[14px]">{r.amenities.join(' · ')}</span>
             </li>
           </ul>
-          <p className="mt-2 text-[12px] text-muted">
+          <div className="mt-2 text-[12px] text-muted">
             Thông tin chưa đúng? <ReportIssue slug={r.slug} label="Báo sai thông tin" defaultReason="hours" />
-          </p>
+          </div>
         </section>
 
         <nav aria-label="Breadcrumb" className="text-[12px] text-muted">

@@ -50,7 +50,7 @@ export function FilterBar({
 
   return (
     <div className={clsx('relative', pending && 'opacity-70')}>
-      <div className="no-scrollbar -mx-3 flex gap-2 overflow-x-auto px-3 py-1">
+      <div className="no-scrollbar relative -mx-3 flex gap-2 overflow-x-auto px-3 py-1">
         {variant === 'results' && (
           <>
             <button

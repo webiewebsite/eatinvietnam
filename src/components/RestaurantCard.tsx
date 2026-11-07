@@ -4,7 +4,7 @@ import { RestaurantPhoto } from '@/components/RestaurantPhoto';
 import { SaveButton } from '@/components/SaveButton';
 import { Rating } from '@/components/ui/Rating';
 import { Tag } from '@/components/ui/Tag';
-import type { CardData } from '@/lib/restaurants';
+import { OPEN_TONE_CLASS, type CardData } from '@/lib/restaurants';
 
 type Variant = 'rail' | 'grid' | 'row' | 'map';
 
@@ -27,7 +27,7 @@ export function RestaurantCard({
 
   if (variant === 'rail') {
     return (
-      <Link href={href} className={clsx('block w-34 shrink-0', className)}>
+      <Link href={href} className={clsx('relative block w-34 shrink-0', className)}>
         <div className="relative">
           <RestaurantPhoto photo={card.photo} dish={card.dish} sizes="136px" className="aspect-[4/3]" />
           {showDistance && (
@@ -47,7 +47,7 @@ export function RestaurantCard({
 
   if (variant === 'grid') {
     return (
-      <Link href={href} className={clsx('block', className)}>
+      <Link href={href} className={clsx('relative block', className)}>
         <div className="relative">
           <RestaurantPhoto photo={card.photo} dish={card.dish} sizes="(max-width: 480px) 50vw, 220px" className="h-28" />
           {rank != null && (
@@ -78,7 +78,7 @@ export function RestaurantCard({
             <Rating avg={card.rating.avg} count={card.rating.count} className="text-[12px]" />
             {meta && <span>· {meta}</span>}
           </p>
-          <p className={clsx('mt-1 text-[12px] font-semibold', card.isOpen ? 'text-raurau' : 'text-danger')}>
+          <p className={clsx('mt-1 text-[12px] font-semibold', OPEN_TONE_CLASS[card.openTone])}>
             {card.openLabel}
           </p>
         </div>
@@ -106,7 +106,7 @@ export function RestaurantCard({
             <span>· {card.districtLabel}</span>
           </p>
           <p className="mt-0.5 text-[13px]">
-            <span className={clsx('font-semibold', card.isOpen ? 'text-raurau' : 'text-danger')}>{card.openLabel}</span>
+            <span className={clsx('font-semibold', OPEN_TONE_CLASS[card.openTone])}>{card.openLabel}</span>
             {card.priceLabel && <span className="text-muted"> · {card.priceLabel}</span>}
           </p>
           <p className="mt-1 truncate text-[12px] text-muted">{card.highlight}</p>
