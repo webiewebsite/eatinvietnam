@@ -1,0 +1,21 @@
+import type { Metadata } from 'next';
+import { MapExplorer } from '@/components/map/MapExplorer';
+import { currentDate } from '@/lib/hours';
+import { searchRestaurants, toCard } from '@/lib/restaurants';
+import { readSearchParams } from '@/lib/search/url';
+
+export const metadata: Metadata = {
+  title: 'Bản đồ món ngon',
+  description: 'Xem quán ăn ngon quanh bạn trên bản đồ: lọc theo món, giá, giờ mở.',
+};
+
+// API contract for the real data source: GET /api/search?bbox=&dish=&open= returns ≤ 50 restaurants.
+const MAX_PINS = 50;
+
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+
+export default async function MapPage({ searchParams }: Props) {
+  const { q, filters } = readSearchParams(await searchParams);
+  const { items } = searchRestaurants(filters, { now: currentDate(), limit: MAX_PINS });
+  return <MapExplorer cards={items.map(toCard)} filters={filters} q={q} />;
+}
