@@ -68,7 +68,7 @@ export function PromoCarousel({ slides, openCount, totalCount }: { slides: Promo
             <div>
               <span className="inline-flex items-center gap-1 rounded-full bg-raurau px-2 py-0.5 text-badge font-bold text-on-raurau">
                 <span aria-hidden className="size-1.5 rounded-full bg-on-raurau" />
-                {openCount ? `${openCount} quán đang mở` : `${totalCount} quán trên bản đồ`}
+                {openCount ? `${openCount} quán đang mở` : `${totalCount} quán`}
               </span>
               <p className="mt-1.5 font-display text-[20px] leading-tight font-extrabold">
                 Bản đồ món
