@@ -1,0 +1,22 @@
+{
+  "$comment": "Editorial copy for dish landing pages. Text in [brackets] is a placeholder the editorial team must write.",
+  "bun-bo": {
+    "title": "Bún bò Huế ngon ở Sài Gòn",
+    "intro": "Bún sợi to, nước dùng hầm xương bò thơm sả và mắm ruốc, ăn kèm giò heo, chả cua, rau sống. Ở Sài Gòn, nhiều quán nêm ngọt hơn và cay vừa hơn so với ở Huế.",
+    "faq": [
+      { "q": "Bún bò Huế ở Sài Gòn giá bao nhiêu?", "a": "[Giá trung bình tính từ dữ liệu quán trên EatInVietnam, cập nhật theo tháng.]" },
+      { "q": "Bún bò Huế khác bún bò Sài Gòn thế nào?", "a": "[Câu trả lời biên tập]" },
+      { "q": "Quán bún bò nào mở khuya?", "a": "auto:late" }
+    ]
+  },
+  "pho": {
+    "title": "Phở ngon ở Sài Gòn",
+    "intro": "[Mô tả biên tập về phở: nước dùng trong, bánh phở mềm, phở bắc và phở kiểu Nam khác nhau ra sao.]",
+    "faq": [{ "q": "Phở ở Sài Gòn giá bao nhiêu?", "a": "[Câu trả lời biên tập]" }]
+  },
+  "hu-tieu": {
+    "title": "Hủ tiếu ngon ở Sài Gòn",
+    "intro": "[Mô tả biên tập: hủ tiếu Nam Vang, hủ tiếu gõ, hủ tiếu khô nước riêng.]",
+    "faq": [{ "q": "Hủ tiếu gõ là gì?", "a": "[Câu trả lời biên tập]" }]
+  }
+}
