@@ -55,6 +55,8 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # publish screenshots + resolved lockfile to ci/screenshots-pr-<n>
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -82,3 +84,13 @@ jobs:
           name: screenshots
           path: screenshots/
           retention-days: 7
+      # Same files on a throwaway branch so reviewers (and tools without artifact access) can open them on GitHub.
+      - name: Publish screenshots branch
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          mkdir -p screenshots && cp package-lock.json screenshots/ 2>/dev/null || true
+          cd screenshots
+          git init -q -b shots
+          git add -A
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "screenshots for ${{ github.event.pull_request.head.sha }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" shots:refs/heads/ci/screenshots-pr-${{ github.event.number }}

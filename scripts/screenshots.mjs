@@ -54,14 +54,19 @@ for (const vp of VIEWPORTS) {
     const errors = [];
     page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
     page.on('pageerror', (e) => errors.push(String(e)));
-    const res = await page.goto(BASE + path, { waitUntil: 'networkidle' });
-    await page.waitForTimeout(500);
-    await page.screenshot({ path: `${OUT}/${name}-${vp.w}.png`, fullPage: true });
-    // Horizontal overflow check: layout must never scroll sideways.
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    report.push({ name, width: vp.w, status: res?.status(), overflow, errors });
+    try {
+      const res = await page.goto(BASE + path, { waitUntil: 'load', timeout: 30000 });
+      // Let fonts, images and client effects settle (networkidle is unreliable with prefetching).
+      await page.waitForTimeout(1500);
+      await page.screenshot({ path: `${OUT}/${name}-${vp.w}.png`, fullPage: true });
+      // Horizontal overflow check: layout must never scroll sideways.
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      report.push({ name, width: vp.w, status: res?.status(), overflow, errors });
+    } catch (e) {
+      report.push({ name, width: vp.w, status: 'error', errors: [...errors, String(e)] });
+    }
     await page.close();
   }
   await context.close();
@@ -70,3 +75,4 @@ for (const vp of VIEWPORTS) {
 await browser.close();
 await writeFile(`${OUT}/report.json`, JSON.stringify(report, null, 2));
 console.warn(JSON.stringify(report, null, 2));
+if (report.some((r) => r.status !== 200 || r.overflow > 0 || r.errors.length)) process.exitCode = 1;
