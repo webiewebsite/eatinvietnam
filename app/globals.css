@@ -192,6 +192,7 @@
   color: var(--on-xoai);
   box-shadow: var(--sticker-shadow);
   transform: scale(1.12);
+  z-index: 30;
 }
 .eiv-user-dot {
   width: 16px;

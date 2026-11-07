@@ -93,8 +93,8 @@ export default function MapboxView({ ref, cards, selected, onSelect, user, onMov
   useEffect(() => {
     for (const [slug, { el }] of markers.current) {
       const on = slug === selected;
+      // z-index for the selected pin comes from CSS (.eiv-pin[aria-pressed='true']).
       el.setAttribute('aria-pressed', String(on));
-      el.style.zIndex = on ? '30' : '10';
     }
     const card = cards.find((c) => c.slug === selected);
     if (card) map.current?.easeTo({ center: [card.lng, card.lat], duration: 300 });
