@@ -40,7 +40,7 @@ function NearMode({ now }: { now: Date }) {
   return (
     <div className="flex flex-col gap-6">
       <CategoryRail />
-      <PromoCarousel slides={home.promos.slice(0, 3)} openCount={countOpen(now)} total={countAll()} />
+      <PromoCarousel slides={home.promos.slice(0, 3)} openCount={countOpen(now)} totalCount={countAll()} />
       <TimeSuggest now={now} />
 
       <section aria-labelledby="near">
