@@ -22,6 +22,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+      # npm 10 (bundled with Node 22) crashes resolving this tree without a lockfile ('edgesOut' bug).
+      - run: npm install -g npm@11 --no-audit --no-fund
       - run: npm install --no-audit --no-fund
       - run: npm run lint
 
@@ -32,6 +34,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+      # npm 10 (bundled with Node 22) crashes resolving this tree without a lockfile ('edgesOut' bug).
+      - run: npm install -g npm@11 --no-audit --no-fund
       - run: npm install --no-audit --no-fund
       # next typegen writes route/param types used by tsc
       - run: npx next typegen
@@ -44,6 +48,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+      # npm 10 (bundled with Node 22) crashes resolving this tree without a lockfile ('edgesOut' bug).
+      - run: npm install -g npm@11 --no-audit --no-fund
       - run: npm install --no-audit --no-fund
       - run: npm test
 
@@ -54,6 +60,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+      # npm 10 (bundled with Node 22) crashes resolving this tree without a lockfile ('edgesOut' bug).
+      - run: npm install -g npm@11 --no-audit --no-fund
       - run: npm install --no-audit --no-fund
       - run: npm run build
       # Until package-lock.json is committed, publish the one CI resolved.
