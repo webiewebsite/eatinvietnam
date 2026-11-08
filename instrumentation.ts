@@ -1,7 +1,6 @@
-/** Runs once when the Next.js server starts. */
+/** Runs once when the Next.js server starts (Node runtime only, never Edge). */
 export async function register() {
-  // Node runtime only (never Edge), and only when a database is configured.
-  if (process.env.NEXT_RUNTIME !== 'nodejs' || !process.env.DATABASE_URL) return;
+  if (process.env.NEXT_RUNTIME !== 'nodejs') return;
   const { bootDatabase } = await import('./src/db/boot');
   await bootDatabase();
 }

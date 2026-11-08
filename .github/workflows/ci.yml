@@ -157,6 +157,8 @@ jobs:
           cat server.log
           grep -q '\[db\] migrations up to date' server.log
           grep -q 'demo seed skipped' server.log
+          curl -fsS http://localhost:3100/api/health | tee health.json
+          grep -q '"restaurants":14' health.json
       - name: Publish generated migrations + lockfile
         if: always() && steps.gen.outputs.changed == 'true' && matrix.engine == 'mariadb:11.8' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: |
