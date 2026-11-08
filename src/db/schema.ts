@@ -192,6 +192,9 @@ export const restaurants = mysqlTable(
     /** ' ' + toSearchText(name, dishes, area, …) + ' ' — whole-word LIKE matching. */
     searchText: text('search_text').notNull(),
     verifiedAt: datetime('verified_at'),
+    /** How the editor verified it (ops, 09/11): ate there, own photos, or phoned the restaurant. */
+    verificationMethod: mysqlEnum('verification_method', ['visited', 'photo', 'phone']),
+    verifiedBy: ref('verified_by').references(() => users.id, { onDelete: 'set null' }),
     /** verified_at + REVERIFY_DAYS; overdue → "chưa cập nhật" (decision #6). */
     reverifyDueAt: datetime('reverify_due_at'),
     createdBy: ref('created_by').references(() => users.id, { onDelete: 'set null' }),
@@ -218,6 +221,22 @@ export const restaurantAreas = mysqlTable(
       .references(() => areas.id, { onDelete: 'cascade' }),
   },
   (t) => [primaryKey({ columns: [t.restaurantId, t.areaId] }), index('restaurant_areas_area_idx').on(t.areaId)],
+);
+
+/** Editor scope (ops, 09/11 "Khu vực phụ trách"): editors may only edit restaurants in these areas. Admins are unscoped. */
+export const userAreas = mysqlTable(
+  'user_areas',
+  {
+    userId: ref('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    areaId: ref('area_id')
+      .notNull()
+      .references(() => areas.id, { onDelete: 'cascade' }),
+    grantedBy: ref('granted_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.areaId] }), index('user_areas_area_idx').on(t.areaId)],
 );
 
 /** Dishes, vibes ("Hẹn hò"), features ("Có máy lạnh"). Dish/vibe slugs mirror content/taxonomy.json. */
