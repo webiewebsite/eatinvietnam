@@ -96,7 +96,7 @@ jobs:
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" shots:refs/heads/ci/screenshots-pr-${{ github.event.number }}
 
   # Migrations + seed + spatial smoke test on a real database.
-  # Hostinger Web/Cloud plans run MariaDB; MySQL 8 is tested too so the schema stays portable.
+  # Hostinger staging runs MariaDB 11.8 (checked 09/11/2026); MySQL 8 is tested too so the schema stays portable.
   db:
     runs-on: ubuntu-latest
     permissions:
@@ -104,7 +104,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        engine: ['mariadb:10.11', 'mysql:8.0']
+        engine: ['mariadb:11.8', 'mysql:8.0']
     services:
       db:
         image: ${{ matrix.engine }}
@@ -132,10 +132,33 @@ jobs:
           npm run db:generate
           if [ -n "$(git status --porcelain src/db/migrations)" ]; then echo "changed=true" >> "$GITHUB_OUTPUT"; fi
       - run: npm run db:migrate
-      - run: npm run db:seed
+      # Same path as Hostinger staging boot: migrations already applied → no-op, then demo seed.
+      - run: npm run db:boot
+        env:
+          MIGRATE_ON_START: '1'
+          SEED_DEMO_IF_EMPTY: '1'
       - run: npm run db:smoke
+      # Second boot must be a no-op (idempotent migrate, seed skipped on a non-empty DB).
+      - run: npm run db:boot 2>&1 | tee boot2.log && grep -q 'demo seed skipped' boot2.log
+        env:
+          MIGRATE_ON_START: '1'
+          SEED_DEMO_IF_EMPTY: '1'
+      # The real Hostinger path: Next server start → instrumentation.ts → bootDatabase().
+      - name: Boot hook inside the built Next server
+        if: matrix.engine == 'mariadb:11.8'
+        env:
+          MIGRATE_ON_START: '1'
+          SEED_DEMO_IF_EMPTY: '1'
+        run: |
+          npm run build
+          npm start -- -p 3100 > server.log 2>&1 &
+          npx --yes wait-on@8 http://localhost:3100/api/health --timeout 90000
+          sleep 2
+          cat server.log
+          grep -q '\[db\] migrations up to date' server.log
+          grep -q 'demo seed skipped' server.log
       - name: Publish generated migrations + lockfile
-        if: always() && steps.gen.outputs.changed == 'true' && matrix.engine == 'mariadb:10.11' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        if: always() && steps.gen.outputs.changed == 'true' && matrix.engine == 'mariadb:11.8' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: |
           mkdir -p /tmp/out && cp -r src/db/migrations /tmp/out/ && cp package-lock.json /tmp/out/
           cd /tmp/out

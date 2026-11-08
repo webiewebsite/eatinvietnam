@@ -18,7 +18,8 @@
     "db:generate": "bash scripts/db-generate.sh",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx scripts/db-seed.ts",
-    "db:smoke": "tsx scripts/db-smoke.ts"
+    "db:smoke": "tsx scripts/db-smoke.ts",
+    "db:boot": "tsx scripts/db-boot.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

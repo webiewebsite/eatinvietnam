@@ -49,3 +49,9 @@ CI uploads the screenshots and the resolved `package-lock.json` as workflow arti
 - Build command: `npm run build` (webpack; Turbopack panicked on Hostinger's build machine, dev still uses Turbopack)
 - Start command: `npm start`
 - Env vars: everything in `.env.example`
+- Database: MariaDB 11.8 on `127.0.0.1:3306` (only reachable from the server). Staging sets
+  `MIGRATE_ON_START=1` and `SEED_DEMO_IF_EMPTY=1` so pending migrations (and, on an empty DB, the
+  demo data) are applied when the app starts — see `src/db/boot.ts`. Look for `[db]` lines in the
+  runtime log after each deploy. Production leaves both unset.
+- Cron (hPanel → Advanced → Cron Jobs), daily:
+  `curl -fsS -H "x-cron-secret: $CRON_SECRET" https://<domain>/api/cron/reverify`
