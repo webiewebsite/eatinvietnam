@@ -1,0 +1,51 @@
+{
+  "$comment": "Editorial content for Home. Slide 1 (map) is fixed in code. Max 4 slides total; sponsored slides must set sponsored=true.",
+  "promos": [
+    {
+      "id": "tuan-le-bun",
+      "kind": "campaign",
+      "eyebrow": "15–30/11",
+      "title": "Tuần lễ Bún Sài Gòn",
+      "sub": "12 quán bún được chọn",
+      "href": "/mon/bun-bo",
+      "tone": "xoai",
+      "sponsored": false
+    },
+    {
+      "id": "an-khuya-q4",
+      "kind": "collection",
+      "eyebrow": "Sau 22:00",
+      "title": "Ăn khuya Quận 4",
+      "sub": "Ốc, hủ tiếu gõ, cháo",
+      "href": "/tim-kiem?khuya=1&quan=quan-4",
+      "tone": "dem",
+      "sponsored": false
+    },
+    {
+      "id": "ca-phe-sang",
+      "kind": "collection",
+      "eyebrow": "Buổi sáng",
+      "title": "Cà phê phin đúng vị",
+      "sub": "Ngồi vỉa hè, nhìn phố",
+      "href": "/mon/ca-phe",
+      "tone": "raurau",
+      "sponsored": false
+    }
+  ],
+  "cities": [
+    { "slug": "tp-hcm", "label": "TP.HCM", "status": "open", "sub": "14 quán demo" },
+    { "slug": "ha-noi", "label": "Hà Nội", "status": "soon", "sub": "Sắp có" },
+    { "slug": "hue", "label": "Huế", "status": "soon", "sub": "Sắp có" },
+    { "slug": "da-nang", "label": "Đà Nẵng", "status": "soon", "sub": "Sắp có" },
+    { "slug": "hoi-an", "label": "Hội An", "status": "soon", "sub": "Sắp có" },
+    { "slug": "can-tho", "label": "Cần Thơ", "status": "soon", "sub": "Sắp có" }
+  ],
+  "foodRoute": [
+    { "city": "Hà Nội", "dish": "Phở", "dishSlug": "pho" },
+    { "city": "Huế", "dish": "Bún bò", "dishSlug": "bun-bo" },
+    { "city": "Hội An", "dish": "Cao lầu", "dishSlug": null },
+    { "city": "Sài Gòn", "dish": "Cơm tấm", "dishSlug": "com-tam" },
+    { "city": "Cần Thơ", "dish": "Bánh xèo", "dishSlug": "banh-xeo" }
+  ],
+  "regional": ["bun-bo", "pho", "banh-xeo", "banh-canh"]
+}

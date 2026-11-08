@@ -1,0 +1,33 @@
+{
+  "$comment": "Single source of truth for dishes, groups and districts. Demo version — ops team will finalise (issue #7).",
+  "groups": [
+    { "slug": "mon-nuoc", "label": "Món nước" },
+    { "slug": "com-banh", "label": "Cơm & bánh" },
+    { "slug": "oc-hai-san", "label": "Ốc & hải sản" },
+    { "slug": "an-vat", "label": "Ăn vặt" },
+    { "slug": "lau", "label": "Lẩu" },
+    { "slug": "do-uong", "label": "Cà phê & chè" },
+    { "slug": "chay", "label": "Món chay" }
+  ],
+  "dishes": [
+    { "slug": "pho", "label": "Phở", "group": "mon-nuoc", "origin": "Gốc Hà Nội", "keywords": ["pho"] },
+    { "slug": "com-tam", "label": "Cơm tấm", "group": "com-banh", "origin": "Gốc Sài Gòn", "keywords": ["com tam", "com suon", "suon bi cha"] },
+    { "slug": "oc", "label": "Ốc", "group": "oc-hai-san", "origin": "Gốc Sài Gòn", "keywords": ["oc", "so diep", "hai san"] },
+    { "slug": "hu-tieu", "label": "Hủ tiếu", "group": "mon-nuoc", "origin": "Gốc Nam Bộ", "keywords": ["hu tieu", "hu tiu", "nam vang", "hu tieu go"] },
+    { "slug": "an-vat", "label": "Ăn vặt", "group": "an-vat", "origin": "Đường phố", "keywords": ["an vat", "banh trang", "bot chien", "xien que"] },
+    { "slug": "ca-phe", "label": "Cà phê", "group": "do-uong", "origin": "Gốc Sài Gòn", "keywords": ["ca phe", "cafe", "cf", "ca phe sua"] },
+    { "slug": "bun-bo", "label": "Bún bò", "group": "mon-nuoc", "origin": "Gốc Huế", "keywords": ["bun bo", "bun bo hue"] },
+    { "slug": "banh-mi", "label": "Bánh mì", "group": "com-banh", "origin": "Gốc Sài Gòn", "keywords": ["banh mi"] },
+    { "slug": "lau", "label": "Lẩu", "group": "lau", "origin": "Khắp nơi", "keywords": ["lau", "lau de", "lau thai"] },
+    { "slug": "banh-xeo", "label": "Bánh xèo", "group": "com-banh", "origin": "Gốc miền Tây", "keywords": ["banh xeo"] },
+    { "slug": "che", "label": "Chè", "group": "do-uong", "origin": "Khắp nơi", "keywords": ["che", "trang mieng"] },
+    { "slug": "mon-chay", "label": "Món chay", "group": "chay", "origin": "Khắp nơi", "keywords": ["chay", "mon chay", "an chay"] },
+    { "slug": "chao", "label": "Cháo", "group": "mon-nuoc", "origin": "Khắp nơi", "keywords": ["chao", "chao ech", "chao long"] },
+    { "slug": "banh-canh", "label": "Bánh canh", "group": "mon-nuoc", "origin": "Gốc miền Trung", "keywords": ["banh canh"] }
+  ],
+  "districts": [
+    { "slug": "quan-1", "label": "Quận 1", "short": "Q1", "keywords": ["quan 1", "q1", "q 1"] },
+    { "slug": "quan-3", "label": "Quận 3", "short": "Q3", "keywords": ["quan 3", "q3", "q 3"] },
+    { "slug": "quan-4", "label": "Quận 4", "short": "Q4", "keywords": ["quan 4", "q4", "q 4"] }
+  ]
+}

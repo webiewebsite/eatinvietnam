@@ -1,1 +1,205 @@
 @import 'tailwindcss';
+
+/* ── Design tokens (EatInVietnam Design System v2, tokens.json) ───────────────
+   Components use Tailwind utilities mapped below; never raw hex in components. */
+:root,
+[data-theme='light'] {
+  --bg: #fff8ee;
+  --surface: #ffffff;
+  --surface-sunken: #f6ede0;
+  --ink: #1c1530;
+  --ink-muted: #5b5470;
+  --line: #eadfcf;
+  --line-strong: #1c1530;
+  --thanhlong: #d6105f;
+  --on-thanhlong: #ffffff;
+  --thanhlong-soft: #ffe3ee;
+  --xoai: #ffc21a;
+  --on-xoai: #1c1530;
+  --xoai-soft: #fff1c2;
+  --raurau: #0b7a6e;
+  --on-raurau: #ffffff;
+  --raurau-soft: #d7f5ef;
+  --danger: #b42318;
+  --dem: #1c1530;
+  --on-dem: #ffffff;
+  --on-dem-muted: #d7d0e6;
+  --vitri: #2b6cf6;
+  --focus: var(--thanhlong);
+  --scrim: rgb(28 21 48 / 0.55);
+  --sticker-shadow: 3px 3px 0 var(--ink);
+  color-scheme: light;
+}
+
+/* Dark theme is declared but not enabled in MVP (decision #1, item 6). */
+[data-theme='dark'] {
+  --bg: #15101f;
+  --surface: #221a33;
+  --surface-sunken: #1c1529;
+  --ink: #fff8ee;
+  --ink-muted: #bdb5cf;
+  --line: #3a2f4f;
+  --line-strong: #fff8ee;
+  --thanhlong: #ff5fa2;
+  --on-thanhlong: #1c1530;
+  --thanhlong-soft: #4a1630;
+  --xoai: #ffc21a;
+  --on-xoai: #1c1530;
+  --xoai-soft: #3d3210;
+  --raurau: #3fd1be;
+  --on-raurau: #1c1530;
+  --raurau-soft: #12352f;
+  --danger: #ff8a80;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-thanhlong: var(--thanhlong);
+  --color-thanhlong-soft: var(--thanhlong-soft);
+  --color-on-thanhlong: var(--on-thanhlong);
+  --color-xoai: var(--xoai);
+  --color-xoai-soft: var(--xoai-soft);
+  --color-on-xoai: var(--on-xoai);
+  --color-raurau: var(--raurau);
+  --color-raurau-soft: var(--raurau-soft);
+  --color-on-raurau: var(--on-raurau);
+  --color-danger: var(--danger);
+  --color-dem: var(--dem);
+  --color-on-dem: var(--on-dem);
+  --color-on-dem-muted: var(--on-dem-muted);
+  --color-vitri: var(--vitri);
+  --color-scrim: var(--scrim);
+
+  --font-display: var(--ff-display), var(--ff-sans), system-ui, sans-serif;
+  --font-sans: var(--ff-sans), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* Type scale: display 40/44 · h1 28/34 · section 18/24 · body 16/24 · meta 12–14 · badge 11 */
+  --text-display: 40px;
+  --text-display--line-height: 44px;
+  --text-h1: 28px;
+  --text-h1--line-height: 34px;
+  --text-section: 18px;
+  --text-section--line-height: 24px;
+  --text-meta: 13px;
+  --text-meta--line-height: 18px;
+  --text-badge: 11px;
+  --text-badge--line-height: 14px;
+
+  --radius-tag: 8px;
+  --radius-input: 14px;
+  --radius-card: 20px;
+
+  --shadow-sticker: var(--sticker-shadow);
+  --shadow-card: 0 1px 2px rgb(28 21 48 / 0.08), 0 8px 24px rgb(28 21 48 / 0.08);
+  --shadow-sheet: 0 -8px 32px rgb(28 21 48 / 0.16);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  h1,
+  h2,
+  h3 {
+    line-height: 1.25;
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  input,
+  select,
+  textarea {
+    font-size: 16px; /* avoid iOS auto-zoom */
+  }
+}
+
+/* Sticker: 2px ink border + hard 3px shadow. Max 1–2 per screen. Press = stamp. */
+@utility sticker {
+  border: 2px solid var(--line-strong);
+  box-shadow: var(--sticker-shadow);
+  transition:
+    transform 150ms ease-out,
+    box-shadow 150ms ease-out;
+  &:active {
+    transform: translate(3px, 3px);
+    box-shadow: none;
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility snap-rail {
+  position: relative;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 16px;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  & > * {
+    scroll-snap-align: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mapbox DOM markers (MapboxView) — mirror <MapPin>. */
+.eiv-pin {
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 4px 10px;
+  font: 700 12px/1.2 var(--ff-sans), system-ui, sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgb(28 21 48 / 0.08), 0 8px 24px rgb(28 21 48 / 0.08);
+  cursor: pointer;
+  transition: transform 150ms ease-out;
+}
+.eiv-pin[aria-pressed='true'] {
+  background: var(--xoai);
+  color: var(--on-xoai);
+  box-shadow: var(--sticker-shadow);
+  transform: scale(1.12);
+  z-index: 30;
+}
+.eiv-user-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 3px solid var(--surface);
+  background: var(--vitri);
+  box-shadow: 0 0 0 6px rgb(43 108 246 / 0.2);
+}
