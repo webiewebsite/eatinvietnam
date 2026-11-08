@@ -19,10 +19,12 @@ const pexels = (id: number, alt: string, w = 1280, h = 960): Photo => ({
 const GRAB = 'https://food.grab.com/vn/vi/';
 const SHOPEE = 'https://shopeefood.vn/';
 const UPDATED = '2026-11-01';
+const VERIFIED = '2026-10-20';
 
 const base = {
   status: 'verified' as const,
   priceUpdatedAt: UPDATED,
+  verifiedAt: VERIFIED,
   isDemo: true as const,
   grabUrl: GRAB,
   shopeeUrl: SHOPEE,
@@ -358,6 +360,8 @@ export const DEMO_RESTAURANTS: Restaurant[] = [
   {
     ...base,
     slug: 'che-co-sau',
+    // Overdue on purpose: shows the "chưa cập nhật" state (decision #6).
+    verifiedAt: '2026-06-15',
     name: 'Chè Cô Sáu',
     dish: 'che',
     dishes: ['che'],

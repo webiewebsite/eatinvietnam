@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   );
   return [
     { url: `${base}/`, changeFrequency: 'daily', priority: 1 },
+    { url: `${base}/chinh-sach-bao-mat`, changeFrequency: 'yearly', priority: 0.2 },
     ...listSlugs().map((s) => ({ url: `${base}/quan/${s}`, changeFrequency: 'weekly' as const, priority: 0.8 })),
     ...dishPages.map((p) => ({ url: `${base}${p}`, changeFrequency: 'weekly' as const, priority: 0.7 })),
     ...DISTRICTS.map((d) => ({ url: `${base}/khu-vuc/${d.slug}`, changeFrequency: 'weekly' as const, priority: 0.6 })),

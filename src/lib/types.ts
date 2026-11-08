@@ -41,6 +41,8 @@ export interface Restaurant {
   priceMin: number | null;
   priceMax: number | null;
   priceUpdatedAt: string; // ISO date
+  /** Last on-site/phone verification by an editor (ISO date). Overdue after REVERIFY_DAYS. */
+  verifiedAt: string;
   /** Editorial rating until user reviews ship (phase 2). */
   rating: { avg: number; count: number };
   editorPick: boolean;

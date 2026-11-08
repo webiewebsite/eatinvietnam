@@ -10,7 +10,8 @@ import { FallbackMap } from '@/components/map/FallbackMap';
 import type { MapHandle } from '@/components/map/types';
 import { distanceFields } from '@/lib/distance';
 import { inBBox, type BBox } from '@/lib/geo';
-import { requestViewerLocation, useViewerLocation } from '@/lib/location-client';
+import { useLocationConsent } from '@/components/LocationConsent';
+import { useViewerLocation, wasLocationDeclined } from '@/lib/location-client';
 import type { CardData } from '@/lib/restaurants';
 import { track } from '@/lib/tracking';
 import type { SearchFilters } from '@/lib/types';
@@ -32,16 +33,15 @@ export function MapExplorer({ cards: all, filters, q }: { cards: CardData[]; fil
   const [selected, setSelected] = useState<string | null>(all[0]?.slug ?? null);
   const [geoDenied, setGeoDenied] = useState(false);
 
-  // The map is the one screen allowed to ask on arrival. Denied → no distances, pins stay.
+  // The map is the one screen that offers location on arrival — through the consent sheet,
+  // never the browser prompt directly — unless the person already said no this session.
+  const { ask, sheet } = useLocationConsent();
   const locate = useCallback(() => {
-    requestViewerLocation().then(
-      () => setGeoDenied(false),
-      () => setGeoDenied(true),
-    );
-  }, []);
+    void ask().then((r) => setGeoDenied(typeof r !== 'object'));
+  }, [ask]);
   useEffect(() => {
-    if (!user) locate();
-    // Only on arrival; later the button asks again.
+    if (!user && !wasLocationDeclined()) locate();
+    // Only on arrival; later the locate button asks again.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -121,7 +121,7 @@ export function MapExplorer({ cards: all, filters, q }: { cards: CardData[]; fil
         </div>
         {geoDenied && !user && (
           <p className="mx-3 mb-2 rounded-input bg-surface/95 px-3 py-1.5 text-[12px] text-muted shadow-card">
-            Không lấy được vị trí nên chưa hiện khoảng cách. Bấm nút định vị để thử lại.
+            Chưa dùng vị trí nên chưa hiện khoảng cách. Bấm nút định vị nếu muốn bật.
           </p>
         )}
         <ul ref={carousel} aria-label="Quán trên bản đồ" className="snap-rail gap-2.5 px-3 scroll-px-3">
@@ -137,6 +137,7 @@ export function MapExplorer({ cards: all, filters, q }: { cards: CardData[]; fil
           )}
         </ul>
       </div>
+      {sheet}
     </div>
   );
 }

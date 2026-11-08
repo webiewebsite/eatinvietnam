@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { Check, X } from 'lucide-react';
 import { track } from '@/lib/tracking';
@@ -83,6 +84,12 @@ export function ReportIssue({ slug, label = 'Báo giá sai', defaultReason = 'pr
               </label>
               {/* Honeypot: bots fill it, people never see it. */}
               <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
+              <p className="text-[12px] text-muted">
+                Nội dung chỉ dùng để đội biên tập kiểm tra lại quán ·{' '}
+                <Link href="/chinh-sach-bao-mat" className="font-semibold text-thanhlong underline">
+                  chính sách bảo mật
+                </Link>
+              </p>
               {state === 'error' && <p className="text-[13px] font-semibold text-danger">Chưa gửi được, thử lại sau nhé.</p>}
               <button type="submit" disabled={state === 'sending'} className="h-12 rounded-full bg-ink font-bold text-surface disabled:opacity-60">
                 {state === 'sending' ? 'Đang gửi…' : 'Gửi báo cáo'}
