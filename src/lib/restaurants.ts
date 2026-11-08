@@ -136,8 +136,12 @@ export function searchRestaurants(
     if (filters.dishes.length && !filters.dishes.some((d) => r.dishes.includes(d))) return false;
     if (filters.group && !r.dishes.some((d) => getDish(d)?.group === filters.group)) return false;
     if (filters.district && r.district !== filters.district) return false;
-    // Unknown price is excluded from price filters: we can't promise "≤ 50k".
-    if (filters.priceMax != null && (r.priceMin == null || r.priceMin > filters.priceMax)) return false;
+    // "Dưới 50k" (ops, 09/11) = the most a person typically pays is ≤ the limit.
+    // Unknown price is excluded: we can't promise "≤ 50k".
+    if (filters.priceMax != null) {
+      const top = r.priceMax ?? r.priceMin;
+      if (top == null || top > filters.priceMax) return false;
+    }
     if (filters.lateNight && !isLateNight(r.hours)) return false;
     if (bbox && !inBBox(r, bbox)) return false;
     if (filters.terms.length && !matchesAllTerms(SEARCH_TEXT.get(r.slug) ?? '', filters.terms)) return false;

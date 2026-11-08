@@ -70,5 +70,8 @@ describe('labels', () => {
     expect(isLateNight(everyDay(['17:00', '02:00']))).toBe(true);
     expect(isLateNight(everyDay(['05:30', '23:30']))).toBe(true);
     expect(isLateNight(everyDay(['06:00', '21:00']))).toBe(false);
+    // Ops rule 09/11: "kéo qua 22:00".
+    expect(isLateNight(everyDay(['10:00', '22:30']))).toBe(true);
+    expect(isLateNight(everyDay(['10:00', '22:00']))).toBe(false);
   });
 });

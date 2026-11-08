@@ -67,9 +67,10 @@ export function openLabel(state: OpenState): string {
   return `Đóng cửa hôm nay`;
 }
 
-/** Open late if any window closes at or after 23:00 or runs past midnight. */
+/** Chip "Ăn khuya" (ops, 09/11): open past 22:00 — closes after 22:00 or runs past midnight. */
+export const LATE_NIGHT_AFTER = '22:00';
 export const isLateNight = (hours: OpeningSlot[]) =>
-  hours.some((s) => isOvernight(s) || toMinutes(s.close) >= 23 * 60);
+  hours.some((s) => isOvernight(s) || toMinutes(s.close) > toMinutes(LATE_NIGHT_AFTER));
 
 /** Group identical windows: "06:00–21:00 hằng ngày" or per-day lines. */
 export function hoursSummary(hours: OpeningSlot[]): { label: string; lines: { day: string; text: string }[] } {

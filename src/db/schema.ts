@@ -192,6 +192,9 @@ export const restaurants = mysqlTable(
     /** ' ' + toSearchText(name, dishes, area, …) + ' ' — whole-word LIKE matching. */
     searchText: text('search_text').notNull(),
     verifiedAt: datetime('verified_at'),
+    /** How the editor verified it (ops, 09/11): ate there, own photos, or phoned the restaurant. */
+    verificationMethod: mysqlEnum('verification_method', ['visited', 'photo', 'phone']),
+    verifiedBy: ref('verified_by').references(() => users.id, { onDelete: 'set null' }),
     /** verified_at + REVERIFY_DAYS; overdue → "chưa cập nhật" (decision #6). */
     reverifyDueAt: datetime('reverify_due_at'),
     createdBy: ref('created_by').references(() => users.id, { onDelete: 'set null' }),

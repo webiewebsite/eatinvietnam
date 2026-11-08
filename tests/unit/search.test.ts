@@ -73,6 +73,13 @@ describe('searchRestaurants (demo data)', () => {
     expect(items.map((h) => h.restaurant.slug)).toContain('com-tam-suon-moc');
   });
 
+  it('"dưới 50k" means the top of the price range is ≤ 50k', () => {
+    const { items } = searchRestaurants({ terms: [], dishes: [], priceMax: 50000 }, { now: noon, limit: 50 });
+    const slugs = items.map((h) => h.restaurant.slug);
+    expect(slugs).toContain('banh-mi-co-tu'); // 20–35k
+    expect(slugs).not.toContain('bun-bo-hue-o-xuan'); // 45–65k
+  });
+
   it('excludes unknown prices from price filters', () => {
     const { items } = searchRestaurants({ terms: [], dishes: [], priceMax: 1_000_000 }, { now: noon, limit: 50 });
     expect(items.map((h) => h.restaurant.slug)).not.toContain('che-co-sau');
