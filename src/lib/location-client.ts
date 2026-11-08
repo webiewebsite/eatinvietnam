@@ -53,3 +53,22 @@ export function requestViewerLocation(): Promise<LatLng> {
     );
   });
 }
+
+const DECLINED_KEY = 'eiv:loc-declined';
+
+/** "Không, cảm ơn" is remembered for the browser session so we don't ask again on every screen. */
+export function wasLocationDeclined(): boolean {
+  try {
+    return sessionStorage.getItem(DECLINED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function markLocationDeclined() {
+  try {
+    sessionStorage.setItem(DECLINED_KEY, '1');
+  } catch {
+    // storage blocked: we'll simply ask again next time
+  }
+}

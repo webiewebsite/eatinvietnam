@@ -15,6 +15,8 @@ const ROUTES = [
   ['05-mon', '/mon/bun-bo'],
   ['06-da-luu', '/da-luu'],
   ['07-toi', '/toi'],
+  ['08-chinh-sach', '/chinh-sach-bao-mat'],
+  ['09-quan-chua-cap-nhat', '/quan/che-co-sau'],
 ];
 
 const VIEWPORTS = [

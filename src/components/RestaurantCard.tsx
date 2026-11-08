@@ -109,7 +109,11 @@ export function RestaurantCard({
             <span className={clsx('font-semibold', OPEN_TONE_CLASS[card.openTone])}>{card.openLabel}</span>
             {card.priceLabel && <span className="text-muted"> · {card.priceLabel}</span>}
           </p>
-          <p className="mt-1 truncate text-[12px] text-muted">{card.highlight}</p>
+          {card.stale ? (
+            <p className="mt-1 text-[12px] font-semibold text-muted">Thông tin chưa cập nhật — giờ mở, giá có thể đã đổi</p>
+          ) : (
+            <p className="mt-1 truncate text-[12px] text-muted">{card.highlight}</p>
+          )}
         </div>
       </Link>
       <SaveButton slug={card.slug} name={card.name} className="absolute top-2 right-0" />

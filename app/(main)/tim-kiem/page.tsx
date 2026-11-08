@@ -26,8 +26,9 @@ export default async function SearchPage({ searchParams }: Props) {
   const { q, filters, page } = readSearchParams(await searchParams);
   const searched = hasAnyFilter(filters);
   const origin = await getViewerLocation();
-  const { items, total, radiusIgnored } = searchRestaurants(filters, { origin, now: currentDate(), limit: PAGE_SIZE * page });
-  const cards = items.map(toCard);
+  const now = currentDate();
+  const { items, total, radiusIgnored } = searchRestaurants(filters, { origin, now, limit: PAGE_SIZE * page });
+  const cards = items.map((h) => toCard(h, now));
   const query = filtersToQuery(filters);
 
   return (

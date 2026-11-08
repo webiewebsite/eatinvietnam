@@ -11,6 +11,7 @@ import { formatPriceRange } from '@/lib/format';
 import { inBBox, type BBox, type LatLng } from '@/lib/geo';
 import { isLateNight, openLabel, openState, type OpenState } from '@/lib/hours';
 import { matchesAllTerms, toStoredSearchText } from '@/lib/search/normalize';
+import { isVerificationOverdue } from '@/lib/verification';
 import { dishLabel, districtLabel, getDish } from '@/lib/taxonomy';
 import type { Photo, Restaurant, SearchFilters } from '@/lib/types';
 
@@ -56,11 +57,13 @@ export interface CardData extends DistanceFields {
   openLabel: string;
   highlight: string;
   editorPick: boolean;
+  /** Past the re-verification deadline → shown as "chưa cập nhật". */
+  stale: boolean;
   lat: number;
   lng: number;
 }
 
-export function toCard(hit: RestaurantHit): CardData {
+export function toCard(hit: RestaurantHit, now: Date = new Date()): CardData {
   const r = hit.restaurant;
   return {
     slug: r.slug,
@@ -80,6 +83,7 @@ export function toCard(hit: RestaurantHit): CardData {
     openLabel: openLabel(hit.state),
     highlight: r.highlight,
     editorPick: r.editorPick,
+    stale: isVerificationOverdue(r.verifiedAt, now),
     lat: r.lat,
     lng: r.lng,
   };
@@ -112,7 +116,7 @@ export function getCardsBySlugs(slugs: string[], origin: LatLng | null = null, n
   const bySlug = new Map(PUBLIC.map((r) => [r.slug, r]));
   return slugs.flatMap((s) => {
     const r = bySlug.get(s);
-    return r ? [toCard(hit(r, origin, now))] : [];
+    return r ? [toCard(hit(r, origin, now), now)] : [];
   });
 }
 
@@ -176,6 +180,13 @@ export function topForDish(dish: string, district?: string, now = new Date()) {
 
 export function countOpen(now = new Date()) {
   return PUBLIC.filter((r) => openState(r.hours, now).open).length;
+}
+
+/** Verified restaurants past their re-verification deadline, oldest first (cron + admin). */
+export function overdueForReverification(now = new Date()) {
+  return PUBLIC.filter((r) => isVerificationOverdue(r.verifiedAt, now))
+    .sort((a, b) => a.verifiedAt.localeCompare(b.verifiedAt))
+    .map((r) => ({ slug: r.slug, name: r.name, verifiedAt: r.verifiedAt }));
 }
 
 export function countAll() {

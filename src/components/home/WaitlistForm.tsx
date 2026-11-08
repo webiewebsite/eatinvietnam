@@ -56,7 +56,7 @@ export function WaitlistForm({ cities }: { cities: { slug: string; label: string
         <input type="checkbox" required className="mt-0.5 size-5 shrink-0 accent-thanhlong" />
         <span>
           Tôi đồng ý nhận email thông báo và đã đọc{' '}
-          <Link href="/toi#chinh-sach" className="font-semibold text-thanhlong underline">
+          <Link href="/chinh-sach-bao-mat" className="font-semibold text-thanhlong underline">
             chính sách bảo mật
           </Link>
           .
