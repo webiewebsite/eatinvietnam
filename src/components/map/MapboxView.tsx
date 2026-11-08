@@ -2,7 +2,6 @@
 
 import { useEffect, useImperativeHandle, useRef } from 'react';
 import mapboxgl, { type Map as MapboxMap, type Marker } from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import type { MapViewProps } from '@/components/map/types';
 import { DEFAULT_CENTER } from '@/lib/geo';
 
@@ -10,6 +9,20 @@ import { DEFAULT_CENTER } from '@/lib/geo';
  * Mapbox GL view. Loaded only via next/dynamic on /ban-do (never on Home).
  * Pins are DOM markers styled like <MapPin>; selection is synced by class toggles.
  */
+/**
+ * Mapbox CSS is loaded from Mapbox's CDN (version-matched) instead of being bundled:
+ * importing it made Turbopack panic on Hostinger's build machine.
+ */
+function ensureMapboxCss() {
+  const id = 'mapbox-gl-css';
+  if (document.getElementById(id)) return;
+  const link = document.createElement('link');
+  link.id = id;
+  link.rel = 'stylesheet';
+  link.href = `https://api.mapbox.com/mapbox-gl-js/v${mapboxgl.version}/mapbox-gl.css`;
+  document.head.appendChild(link);
+}
+
 export default function MapboxView({ ref, cards, selected, onSelect, user, onMoved }: MapViewProps) {
   const container = useRef<HTMLDivElement>(null);
   const map = useRef<MapboxMap | null>(null);
@@ -32,6 +45,7 @@ export default function MapboxView({ ref, cards, selected, onSelect, user, onMov
   // Create the map once.
   useEffect(() => {
     if (!container.current) return;
+    ensureMapboxCss();
     const m = new mapboxgl.Map({
       container: container.current,
       accessToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
