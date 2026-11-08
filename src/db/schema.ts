@@ -223,6 +223,22 @@ export const restaurantAreas = mysqlTable(
   (t) => [primaryKey({ columns: [t.restaurantId, t.areaId] }), index('restaurant_areas_area_idx').on(t.areaId)],
 );
 
+/** Editor scope (ops, 09/11 "Khu vực phụ trách"): editors may only edit restaurants in these areas. Admins are unscoped. */
+export const userAreas = mysqlTable(
+  'user_areas',
+  {
+    userId: ref('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    areaId: ref('area_id')
+      .notNull()
+      .references(() => areas.id, { onDelete: 'cascade' }),
+    grantedBy: ref('granted_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.areaId] }), index('user_areas_area_idx').on(t.areaId)],
+);
+
 /** Dishes, vibes ("Hẹn hò"), features ("Có máy lạnh"). Dish/vibe slugs mirror content/taxonomy.json. */
 export const tags = mysqlTable(
   'tags',
