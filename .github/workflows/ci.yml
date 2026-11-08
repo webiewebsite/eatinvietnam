@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 22
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      # npm 10 (bundled with Node 22) crashes resolving this tree without a lockfile ('edgesOut' bug).
+      - run: npm install -g npm@11 --no-audit --no-fund
+      - run: npm install --no-audit --no-fund
+      - run: npm run lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      # npm 10 (bundled with Node 22) crashes resolving this tree without a lockfile ('edgesOut' bug).
+      - run: npm install -g npm@11 --no-audit --no-fund
+      - run: npm install --no-audit --no-fund
+      # next typegen writes route/param types used by tsc
+      - run: npx next typegen
+      - run: npm run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      # npm 10 (bundled with Node 22) crashes resolving this tree without a lockfile ('edgesOut' bug).
+      - run: npm install -g npm@11 --no-audit --no-fund
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # publish screenshots + resolved lockfile to ci/screenshots-pr-<n>
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      # npm 10 (bundled with Node 22) crashes resolving this tree without a lockfile ('edgesOut' bug).
+      - run: npm install -g npm@11 --no-audit --no-fund
+      - run: npm install --no-audit --no-fund
+      - run: npm run build
+      # Until package-lock.json is committed, publish the one CI resolved.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-lock
+          path: package-lock.json
+          retention-days: 7
+      - name: Mobile screenshots (360px / 390px)
+        run: |
+          npx playwright install --with-deps chromium
+          npm start -- -p 3000 &
+          npx --yes wait-on@8 http://localhost:3000/api/health --timeout 60000
+          npm run screenshots
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: screenshots/
+          retention-days: 7
+      # Same files on a throwaway branch so reviewers (and tools without artifact access) can open them on GitHub.
+      - name: Publish screenshots branch
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          mkdir -p screenshots && cp package-lock.json screenshots/ 2>/dev/null || true
+          cd screenshots
+          git init -q -b shots
+          git add -A
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "screenshots for ${{ github.event.pull_request.head.sha }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" shots:refs/heads/ci/screenshots-pr-${{ github.event.number }}

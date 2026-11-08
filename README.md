@@ -27,4 +27,25 @@ No direct pushes to `main` or `develop`. Every PR needs a linked issue and green
 
 ## Getting started
 
-See the bootstrap PR for local setup instructions (Node version, env vars, scripts).
+Requires Node 22 (same major as Hostinger; see `engines`).
+
+```bash
+cp .env.example .env.local   # fill what you need; all keys are optional for the UI demo
+npm install
+npm run dev                  # http://localhost:3000
+```
+
+| Script | What it does |
+|---|---|
+| `npm run lint` / `typecheck` / `test` / `build` | Same four checks CI requires |
+| `npm run test:e2e` | Playwright e2e (main flow) |
+| `npm run screenshots` | Full-page 360px / 390px screenshots of main routes into `screenshots/` (needs a running server) |
+
+CI uploads the screenshots and the resolved `package-lock.json` as workflow artifacts on every PR.
+
+### Hostinger (hPanel)
+
+- Node version: 22
+- Build command: `npm run build`
+- Start command: `npm start`
+- Env vars: everything in `.env.example`
