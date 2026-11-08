@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Logo } from '@/components/Logo';
 import { RecentlyViewed } from '@/components/saved/RecentlyViewed';
@@ -25,10 +27,13 @@ export default function MePage() {
         <h2 id="policy" className="font-display text-section font-bold">
           Chính sách bảo mật
         </h2>
-        <p className="mt-1 text-[14px] text-muted">
-          [Nội dung chính sách bảo mật — chờ pháp chế/vận hành]. Tóm tắt: không cần đăng nhập; quán đã lưu nằm trên máy bạn
-          (localStorage); số liệu sử dụng ẩn danh, không lưu IP hay email.
-        </p>
+        <p className="mt-1 text-[14px] text-muted">Dữ liệu nào được dùng, lưu ở đâu và trong bao lâu.</p>
+        <Link
+          href="/chinh-sach-bao-mat"
+          className="mt-2 inline-flex h-11 items-center gap-1 rounded-full border border-line bg-surface px-4 text-[14px] font-bold shadow-card"
+        >
+          Đọc chính sách bảo mật <ChevronRight aria-hidden className="size-4" />
+        </Link>
       </section>
 
       <section aria-labelledby="feedback">

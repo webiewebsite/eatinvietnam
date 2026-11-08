@@ -15,6 +15,7 @@ import { currentDate, hoursSummary } from '@/lib/hours';
 import { getHit, getRestaurant, listSlugs } from '@/lib/restaurants';
 import { breadcrumbJsonLd, clamp, jsonLdString, restaurantBreadcrumb, restaurantJsonLd } from '@/lib/seo';
 import { dishLabel, districtLabel } from '@/lib/taxonomy';
+import { isVerificationOverdue } from '@/lib/verification';
 
 // ISR: admin saves call revalidatePath('/quan/<slug>') (issue #8).
 export const revalidate = 3600;
@@ -53,6 +54,8 @@ export default async function RestaurantPage({ params }: Props) {
   const hit = getHit(slug, null, currentDate());
   if (!hit) notFound();
   const r = hit.restaurant;
+  // ISR: revalidated hourly, so the overdue flag is at most an hour late.
+  const stale = isVerificationOverdue(r.verifiedAt, currentDate());
   const hours = hoursSummary(r.hours);
   const mustTry = r.menu.filter((m) => m.mustTry).slice(0, 3);
   const crumbs = restaurantBreadcrumb(r);
@@ -67,7 +70,14 @@ export default async function RestaurantPage({ params }: Props) {
         }}
       />
 
-      <MerchantHeader hit={hit} />
+      <MerchantHeader hit={hit} stale={stale} />
+
+      {stale && (
+        <div role="note" className="mx-3 mt-3 rounded-input bg-sunken px-3 py-2 text-[13px]">
+          <strong>Thông tin chưa cập nhật.</strong> Lần xác minh gần nhất {formatDate(r.verifiedAt)} — giờ mở và giá có thể đã
+          thay đổi. <ReportIssue slug={r.slug} label="Báo thông tin mới" defaultReason="hours" />
+        </div>
+      )}
 
       <nav aria-label="Mục trong trang" className="sticky top-0 z-30 mt-3 border-b border-line bg-bg/95 backdrop-blur">
         <ul className="no-scrollbar flex gap-1 overflow-x-auto px-3">
@@ -113,7 +123,7 @@ export default async function RestaurantPage({ params }: Props) {
             <p className="mt-2 text-meta text-muted">Quán chưa có thực đơn trên EatInVietnam.</p>
           )}
           <div className="mt-2 text-[12px] text-muted">
-            Giá cập nhật {formatDate(r.priceUpdatedAt)} · <ReportIssue slug={r.slug} />
+            Giá cập nhật {formatDate(r.priceUpdatedAt)} · Xác minh {formatDate(r.verifiedAt)} · <ReportIssue slug={r.slug} />
           </div>
         </section>
 

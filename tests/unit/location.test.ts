@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { distanceFields } from '@/lib/distance';
 import { formatLocCookie, parseLocCookie } from '@/lib/location';
-import { getCardsBySlugs, nearby, searchRestaurants } from '@/lib/restaurants';
+import { getCardsBySlugs, nearby, overdueForReverification, searchRestaurants } from '@/lib/restaurants';
+import { REVERIFY_DAYS, isVerificationOverdue } from '@/lib/verification';
 import { parseQuery } from '@/lib/search/rule-parser';
 
 const noon = new Date('2026-11-09T12:00:00+07:00');
@@ -48,5 +49,23 @@ describe('single distance source', () => {
     const farAway = searchRestaurants(f, { origin: { lat: 10.9, lng: 106.5 }, now: noon, limit: 50 });
     expect(farAway.radiusIgnored).toBe(false);
     expect(farAway.total).toBe(0);
+  });
+});
+
+describe('re-verification (decision #6)', () => {
+
+  it('is overdue exactly REVERIFY_DAYS after verification', () => {
+    expect(REVERIFY_DAYS).toBe(90);
+    expect(isVerificationOverdue('2026-08-01', new Date('2026-10-29T00:00:00Z'))).toBe(false);
+    expect(isVerificationOverdue('2026-08-01', new Date('2026-10-30T00:00:00Z'))).toBe(true);
+    expect(isVerificationOverdue('not-a-date', noon)).toBe(true);
+  });
+
+  it('lists overdue demo restaurants and flags their cards', () => {
+    expect(overdueForReverification(noon).map((r) => r.slug)).toEqual(['che-co-sau']);
+    const [stale] = getCardsBySlugs(['che-co-sau'], null, noon);
+    const [fresh] = getCardsBySlugs(['com-tam-suon-moc'], null, noon);
+    expect(stale?.stale).toBe(true);
+    expect(fresh?.stale).toBe(false);
   });
 });

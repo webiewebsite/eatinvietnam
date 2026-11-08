@@ -39,8 +39,8 @@ export default async function HomePage({ searchParams }: Props) {
 
 function NearMode({ now, origin }: { now: Date; origin: LatLng | null }) {
   // Without the viewer's location these lists are editorial picks, not "near you".
-  const near = nearby(origin, 8, now).map(toCard);
-  const late = lateNight(origin, 4, now).map(toCard);
+  const near = nearby(origin, 8, now).map((h) => toCard(h, now));
+  const late = lateNight(origin, 4, now).map((h) => toCard(h, now));
 
   return (
     <div className="flex flex-col gap-6">

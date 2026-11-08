@@ -11,7 +11,7 @@ import type { RestaurantHit } from '@/lib/restaurants';
 import { dishLabel, districtLabel } from '@/lib/taxonomy';
 
 /** Hero 210px + info card overlapping 44px + 4-column stat strip + one-line tip. */
-export function MerchantHeader({ hit }: { hit: RestaurantHit }) {
+export function MerchantHeader({ hit, stale }: { hit: RestaurantHit; stale: boolean }) {
   const r = hit.restaurant;
   const price = formatPriceRange(r.priceMin, r.priceMax);
   const photo = r.photos[0];
@@ -39,6 +39,7 @@ export function MerchantHeader({ hit }: { hit: RestaurantHit }) {
       <div className="relative z-10 mx-3 -mt-11 rounded-card bg-surface p-4 shadow-card">
         <div className="flex flex-wrap items-center gap-1.5">
           {r.editorPick && <Tag tone="pick">Đáng thử</Tag>}
+          {stale && <Tag tone="neutral">Chưa cập nhật</Tag>}
           <span className="text-[12px] text-muted">
             {dishLabel(r.dish)} · {r.venueType} · {districtLabel(r.district)}
           </span>
