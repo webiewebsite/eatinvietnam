@@ -17,7 +17,7 @@ export function MapPin({
     <button
       type="button"
       aria-pressed={selected}
-      aria-label={`${card.name}, ${card.dishLabel}, ${card.distanceLabel}`}
+      aria-label={[card.name, card.dishLabel, card.distanceLabel].filter(Boolean).join(', ')}
       onClick={() => onSelect(card.slug)}
       className={clsx(
         'relative -translate-x-1/2 -translate-y-full rounded-full border-2 border-line-strong px-2.5 py-1 text-[12px] font-bold whitespace-nowrap transition-transform',

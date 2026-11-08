@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { MapExplorer } from '@/components/map/MapExplorer';
 import { currentDate } from '@/lib/hours';
+import { getViewerLocation } from '@/lib/location-server';
 import { searchRestaurants, toCard } from '@/lib/restaurants';
 import { readSearchParams } from '@/lib/search/url';
 
@@ -16,6 +17,6 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 export default async function MapPage({ searchParams }: Props) {
   const { q, filters } = readSearchParams(await searchParams);
-  const { items } = searchRestaurants(filters, { now: currentDate(), limit: MAX_PINS });
+  const { items } = searchRestaurants(filters, { origin: await getViewerLocation(), now: currentDate(), limit: MAX_PINS });
   return <MapExplorer cards={items.map(toCard)} filters={filters} q={q} />;
 }

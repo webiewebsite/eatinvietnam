@@ -60,7 +60,7 @@ export default async function DistrictPage({ params }: Props) {
       <ul className="mt-2 divide-y divide-line">
         {items.map((h) => (
           <li key={h.restaurant.slug}>
-            <RestaurantCard card={toCard(h)} variant="row" />
+            <RestaurantCard card={toCard(h)} variant="row" showDistance={false} />
           </li>
         ))}
       </ul>

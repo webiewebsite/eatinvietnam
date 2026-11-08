@@ -49,8 +49,8 @@ const TABS = [
 
 export default async function RestaurantPage({ params }: Props) {
   const { slug } = await params;
-  // Distance from the default centre at build/revalidate time; live distance needs client geo.
-  const hit = getHit(slug, undefined, currentDate());
+  // ISR: no viewer location on the server; DistanceStat computes it client-side from the same cookie.
+  const hit = getHit(slug, null, currentDate());
   if (!hit) notFound();
   const r = hit.restaurant;
   const hours = hoursSummary(r.hours);

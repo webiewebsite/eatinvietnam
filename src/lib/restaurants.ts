@@ -1,10 +1,14 @@
 /**
  * Restaurant read layer. Backed by demo data for now; the function signatures are
  * what the MySQL/Drizzle implementation (issues #4, #6) will keep.
+ *
+ * `origin` is the viewer's location (see lib/location.ts) or null when unknown.
+ * Unknown origin → no distances, no radius filter, lists sorted by editorial rank.
  */
 import { DEMO_RESTAURANTS } from '@/data/demo-restaurants';
-import { formatDistance, formatPriceRange } from '@/lib/format';
-import { DEFAULT_CENTER, distanceMeters, inBBox, type BBox, type LatLng } from '@/lib/geo';
+import { distanceFields, type DistanceFields } from '@/lib/distance';
+import { formatPriceRange } from '@/lib/format';
+import { inBBox, type BBox, type LatLng } from '@/lib/geo';
 import { isLateNight, openLabel, openState, type OpenState } from '@/lib/hours';
 import { matchesAllTerms, toStoredSearchText } from '@/lib/search/normalize';
 import { dishLabel, districtLabel, getDish } from '@/lib/taxonomy';
@@ -29,14 +33,13 @@ const SEARCH_TEXT = new Map(
   ]),
 );
 
-export interface RestaurantHit {
+export interface RestaurantHit extends DistanceFields {
   restaurant: Restaurant;
-  distance: number;
   state: OpenState;
 }
 
 /** Serializable shape passed to client components (cards, map, saved list). */
-export interface CardData {
+export interface CardData extends DistanceFields {
   slug: string;
   name: string;
   dish: string;
@@ -47,8 +50,6 @@ export interface CardData {
   photo: Photo | null;
   priceLabel: string | null;
   rating: { avg: number; count: number };
-  distance: number;
-  distanceLabel: string;
   isOpen: boolean;
   /** open → raurau, later today/tomorrow → muted, closed → danger */
   openTone: 'open' | 'later' | 'closed';
@@ -73,7 +74,7 @@ export function toCard(hit: RestaurantHit): CardData {
     priceLabel: formatPriceRange(r.priceMin, r.priceMax),
     rating: r.rating,
     distance: hit.distance,
-    distanceLabel: formatDistance(hit.distance),
+    distanceLabel: hit.distanceLabel,
     isOpen: hit.state.open,
     openTone: hit.state.open ? 'open' : hit.state.opensAt ? 'later' : 'closed',
     openLabel: openLabel(hit.state),
@@ -84,35 +85,39 @@ export function toCard(hit: RestaurantHit): CardData {
   };
 }
 
-const hit = (r: Restaurant, center: LatLng, now: Date): RestaurantHit => ({
+const hit = (r: Restaurant, origin: LatLng | null, now: Date): RestaurantHit => ({
   restaurant: r,
-  distance: distanceMeters(center, r),
+  ...distanceFields(origin, r),
   state: openState(r.hours, now),
 });
+
+/** Editorial rank: editor picks first, then rating. Used when there is no distance to sort by. */
+const byEditorial = (a: RestaurantHit, b: RestaurantHit) =>
+  Number(b.restaurant.editorPick) - Number(a.restaurant.editorPick) || b.restaurant.rating.avg - a.restaurant.rating.avg;
 
 export function getRestaurant(slug: string): Restaurant | undefined {
   return PUBLIC.find((r) => r.slug === slug);
 }
 
-export function getHit(slug: string, center: LatLng = DEFAULT_CENTER, now = new Date()): RestaurantHit | undefined {
+export function getHit(slug: string, origin: LatLng | null = null, now = new Date()): RestaurantHit | undefined {
   const r = getRestaurant(slug);
-  return r ? hit(r, center, now) : undefined;
+  return r ? hit(r, origin, now) : undefined;
 }
 
 export function listSlugs(): string[] {
   return PUBLIC.map((r) => r.slug);
 }
 
-export function getCardsBySlugs(slugs: string[], center: LatLng = DEFAULT_CENTER, now = new Date()): CardData[] {
+export function getCardsBySlugs(slugs: string[], origin: LatLng | null = null, now = new Date()): CardData[] {
   const bySlug = new Map(PUBLIC.map((r) => [r.slug, r]));
   return slugs.flatMap((s) => {
     const r = bySlug.get(s);
-    return r ? [toCard(hit(r, center, now))] : [];
+    return r ? [toCard(hit(r, origin, now))] : [];
   });
 }
 
 export interface SearchOptions {
-  center?: LatLng;
+  origin?: LatLng | null;
   now?: Date;
   bbox?: BBox;
   limit?: number;
@@ -121,8 +126,8 @@ export interface SearchOptions {
 
 export function searchRestaurants(
   filters: SearchFilters,
-  { center = DEFAULT_CENTER, now = new Date(), bbox, limit = 20, offset = 0 }: SearchOptions = {},
-): { items: RestaurantHit[]; total: number } {
+  { origin = null, now = new Date(), bbox, limit = 20, offset = 0 }: SearchOptions = {},
+): { items: RestaurantHit[]; total: number; radiusIgnored: boolean } {
   const matched = PUBLIC.filter((r) => {
     if (filters.dishes.length && !filters.dishes.some((d) => r.dishes.includes(d))) return false;
     if (filters.group && !r.dishes.some((d) => getDish(d)?.group === filters.group)) return false;
@@ -134,38 +139,39 @@ export function searchRestaurants(
     if (filters.terms.length && !matchesAllTerms(SEARCH_TEXT.get(r.slug) ?? '', filters.terms)) return false;
     return true;
   })
-    .map((r) => hit(r, center, now))
+    .map((r) => hit(r, origin, now))
     .filter((h) => !filters.openNow || h.state.open)
-    .filter((h) => filters.radiusKm == null || h.distance <= filters.radiusKm * 1000);
+    // "Trong 2 km" needs a real origin; without one the filter is reported as ignored.
+    .filter((h) => filters.radiusKm == null || h.distance == null || h.distance <= filters.radiusKm * 1000);
 
   const sorted =
     filters.sort === 'rating'
       ? matched.sort((a, b) => b.restaurant.rating.avg - a.restaurant.rating.avg)
-      : matched.sort((a, b) => a.distance - b.distance);
+      : origin
+        ? matched.sort((a, b) => (a.distance ?? 0) - (b.distance ?? 0))
+        : matched.sort(byEditorial);
 
-  return { items: sorted.slice(offset, offset + limit), total: sorted.length };
+  return {
+    items: sorted.slice(offset, offset + limit),
+    total: sorted.length,
+    radiusIgnored: filters.radiusKm != null && !origin,
+  };
 }
 
 export const emptyFilters = (): SearchFilters => ({ terms: [], dishes: [] });
 
-export function nearby(center: LatLng = DEFAULT_CENTER, limit = 8, now = new Date()) {
-  return searchRestaurants(emptyFilters(), { center, now, limit }).items;
+export function nearby(origin: LatLng | null, limit = 8, now = new Date()) {
+  return searchRestaurants(emptyFilters(), { origin, now, limit }).items;
 }
 
-export function lateNight(center: LatLng = DEFAULT_CENTER, limit = 5, now = new Date()) {
-  return searchRestaurants({ ...emptyFilters(), lateNight: true }, { center, now, limit }).items;
+export function lateNight(origin: LatLng | null, limit = 5, now = new Date()) {
+  return searchRestaurants({ ...emptyFilters(), lateNight: true }, { origin, now, limit }).items;
 }
 
 /** Ranked list for a dish landing page: editor picks first, then rating. */
 export function topForDish(dish: string, district?: string, now = new Date()) {
-  const { items } = searchRestaurants(
-    { ...emptyFilters(), dishes: [dish], district, sort: 'rating' },
-    { now, limit: 50 },
-  );
-  return items.sort(
-    (a, b) =>
-      Number(b.restaurant.editorPick) - Number(a.restaurant.editorPick) || b.restaurant.rating.avg - a.restaurant.rating.avg,
-  );
+  const { items } = searchRestaurants({ ...emptyFilters(), dishes: [dish], district }, { now, limit: 50 });
+  return items.sort(byEditorial);
 }
 
 export function countOpen(now = new Date()) {

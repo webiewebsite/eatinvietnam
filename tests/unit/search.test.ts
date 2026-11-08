@@ -84,9 +84,16 @@ describe('searchRestaurants (demo data)', () => {
     expect(items.map((h) => h.restaurant.slug)).not.toContain('ca-phe-phin-goc-pho');
   });
 
-  it('sorts by distance by default', () => {
-    const { items } = searchRestaurants({ terms: [], dishes: [] }, { now: noon, limit: 50 });
-    const d = items.map((h) => h.distance);
+  it('sorts by distance when the viewer location is known', () => {
+    const origin = { lat: 10.7725, lng: 106.698 };
+    const { items } = searchRestaurants({ terms: [], dishes: [] }, { origin, now: noon, limit: 50 });
+    const d = items.map((h) => h.distance ?? 0);
     expect([...d].sort((a, b) => a - b)).toEqual(d);
+  });
+
+  it('sorts editor picks first when the location is unknown', () => {
+    const { items } = searchRestaurants({ terms: [], dishes: [] }, { now: noon, limit: 50 });
+    const firstNonPick = items.findIndex((h) => !h.restaurant.editorPick);
+    expect(items.slice(firstNonPick).some((h) => h.restaurant.editorPick)).toBe(false);
   });
 });
