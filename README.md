@@ -46,6 +46,6 @@ CI uploads the screenshots and the resolved `package-lock.json` as workflow arti
 ### Hostinger (hPanel)
 
 - Node version: 22
-- Build command: `npm run build`
+- Build command: `npm run build` (webpack; Turbopack panicked on Hostinger's build machine, dev still uses Turbopack)
 - Start command: `npm start`
 - Env vars: everything in `.env.example`
