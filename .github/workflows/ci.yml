@@ -94,3 +94,57 @@ jobs:
           git add -A
           git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "screenshots for ${{ github.event.pull_request.head.sha }}"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" shots:refs/heads/ci/screenshots-pr-${{ github.event.number }}
+
+  # Migrations + seed + spatial smoke test on a real database.
+  # Hostinger Web/Cloud plans run MariaDB; MySQL 8 is tested too so the schema stays portable.
+  db:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # publish generated migrations to ci/migrations-pr-<n>
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: ['mariadb:10.11', 'mysql:8.0']
+    services:
+      db:
+        image: ${{ matrix.engine }}
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: eatinvietnam_ci
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: eatinvietnam_ci
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot || healthcheck.sh --connect"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    env:
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/eatinvietnam_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: npm install -g npm@11 --no-audit --no-fund
+      - run: npm install --no-audit --no-fund
+      - name: Generate migrations from schema
+        id: gen
+        run: |
+          npm run db:generate
+          if [ -n "$(git status --porcelain src/db/migrations)" ]; then echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+      - run: npm run db:migrate
+      - run: npm run db:seed
+      - run: npm run db:smoke
+      - name: Publish generated migrations + lockfile
+        if: always() && steps.gen.outputs.changed == 'true' && matrix.engine == 'mariadb:10.11' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          mkdir -p /tmp/out && cp -r src/db/migrations /tmp/out/ && cp package-lock.json /tmp/out/
+          cd /tmp/out
+          git init -q -b out
+          git add -A
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "migrations for ${{ github.event.pull_request.head.sha }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" out:refs/heads/ci/migrations-pr-${{ github.event.number }}
+      - name: Migrations must be committed
+        if: steps.gen.outputs.changed == 'true'
+        run: |
+          echo "::error::src/db/schema.ts changed without a committed migration. Run 'npm run db:generate' (or copy from branch ci/migrations-pr-${{ github.event.number }}) and commit."
+          exit 1
