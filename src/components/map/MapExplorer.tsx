@@ -8,8 +8,9 @@ import { RestaurantCard } from '@/components/RestaurantCard';
 import { SearchBar } from '@/components/SearchBar';
 import { FallbackMap } from '@/components/map/FallbackMap';
 import type { MapHandle } from '@/components/map/types';
-import { formatDistance } from '@/lib/format';
-import { DEFAULT_CENTER, distanceMeters, inBBox, type BBox, type LatLng } from '@/lib/geo';
+import { distanceFields } from '@/lib/distance';
+import { inBBox, type BBox } from '@/lib/geo';
+import { requestViewerLocation, useViewerLocation } from '@/lib/location-client';
 import type { CardData } from '@/lib/restaurants';
 import { track } from '@/lib/tracking';
 import type { SearchFilters } from '@/lib/types';
@@ -24,28 +25,30 @@ const HAS_TOKEN = !!process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 export function MapExplorer({ cards: all, filters, q }: { cards: CardData[]; filters: SearchFilters; q: string }) {
   const mapRef = useRef<MapHandle>(null);
   const carousel = useRef<HTMLUListElement>(null);
-  const [user, setUser] = useState<LatLng | null>(null);
+  // Same rounded location (cookie) every other screen uses → identical distances.
+  const user = useViewerLocation();
   const [area, setArea] = useState<BBox | null>(null);
   const [moved, setMoved] = useState(false);
   const [selected, setSelected] = useState<string | null>(all[0]?.slug ?? null);
   const [geoDenied, setGeoDenied] = useState(false);
 
-  // Ask for location here (never on app open). Denied → stay centred on Q1.
+  // The map is the one screen allowed to ask on arrival. Denied → no distances, pins stay.
   const locate = useCallback(() => {
-    navigator.geolocation?.getCurrentPosition(
-      (pos) => setUser({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+    requestViewerLocation().then(
+      () => setGeoDenied(false),
       () => setGeoDenied(true),
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300_000 },
     );
   }, []);
-  useEffect(locate, [locate]);
+  useEffect(() => {
+    if (!user) locate();
+    // Only on arrival; later the button asks again.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const cards = useMemo(() => {
-    const origin = user ?? DEFAULT_CENTER;
-    return all
-      .filter((c) => !area || inBBox(c, area))
-      .map((c) => (user ? { ...c, distance: distanceMeters(origin, c), distanceLabel: formatDistance(distanceMeters(origin, c)) } : c))
-      .sort((a, b) => a.distance - b.distance);
+    const inArea = all.filter((c) => !area || inBBox(c, area)).map((c) => ({ ...c, ...distanceFields(user, c) }));
+    // No location: keep the server's editorial order.
+    return user ? inArea.sort((a, b) => (a.distance ?? 0) - (b.distance ?? 0)) : inArea;
   }, [all, user, area]);
 
   const select = useCallback((slug: string) => {
@@ -105,7 +108,7 @@ export function MapExplorer({ cards: all, filters, q }: { cards: CardData[]; fil
       <div className="absolute inset-x-0 bottom-0 pb-3">
         <div className="mb-2 flex items-center justify-between px-3">
           <p className="rounded-full bg-surface/95 px-3 py-1 text-[13px] font-semibold shadow-card" aria-live="polite">
-            {cards.length} quán{area ? ' · trong khu vực' : user ? ' · gần bạn' : ' · quanh Quận 1'}
+            {cards.length} quán{area ? ' · trong khu vực' : user ? ' · gần bạn' : ''}
           </p>
           <button
             type="button"
@@ -118,7 +121,7 @@ export function MapExplorer({ cards: all, filters, q }: { cards: CardData[]; fil
         </div>
         {geoDenied && !user && (
           <p className="mx-3 mb-2 rounded-input bg-surface/95 px-3 py-1.5 text-[12px] text-muted shadow-card">
-            Không lấy được vị trí — đang hiển thị quanh Quận 1.
+            Không lấy được vị trí nên chưa hiện khoảng cách. Bấm nút định vị để thử lại.
           </p>
         )}
         <ul ref={carousel} aria-label="Quán trên bản đồ" className="snap-rail gap-2.5 px-3 scroll-px-3">

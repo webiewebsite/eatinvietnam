@@ -3,10 +3,10 @@ import { ArrowLeft } from 'lucide-react';
 import { OpenStat } from '@/components/OpenStatus';
 import { RestaurantPhoto } from '@/components/RestaurantPhoto';
 import { SaveButton } from '@/components/SaveButton';
+import { DistanceStat } from '@/components/merchant/DistanceStat';
 import { ShareButton } from '@/components/merchant/ShareButton';
 import { Tag } from '@/components/ui/Tag';
-import { formatDistance, formatPriceRange, formatRating } from '@/lib/format';
-import { scooterMinutes } from '@/lib/geo';
+import { formatPriceRange, formatRating } from '@/lib/format';
 import type { RestaurantHit } from '@/lib/restaurants';
 import { dishLabel, districtLabel } from '@/lib/taxonomy';
 
@@ -55,8 +55,7 @@ export function MerchantHeader({ hit }: { hit: RestaurantHit }) {
           </div>
           <div className="px-1">
             <dt className="sr-only">Khoảng cách</dt>
-            <dd className="font-display text-[17px] font-extrabold">{formatDistance(hit.distance)}</dd>
-            <dd className="text-badge text-muted">~{scooterMinutes(hit.distance)} phút xe</dd>
+            <DistanceStat place={{ lat: r.lat, lng: r.lng }} />
           </div>
           <div className="px-1">
             <dt className="sr-only">Giá</dt>

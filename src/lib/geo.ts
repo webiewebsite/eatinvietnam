@@ -3,7 +3,7 @@ export interface LatLng {
   lng: number;
 }
 
-/** Default centre when location is unknown or denied: Bến Thành, Quận 1. */
+/** Initial map camera only (Bến Thành, Quận 1). Never a distance origin: see lib/location.ts. */
 export const DEFAULT_CENTER: LatLng = { lat: 10.7725, lng: 106.698 };
 
 const R = 6371000;

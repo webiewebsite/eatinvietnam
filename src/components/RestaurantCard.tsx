@@ -30,7 +30,7 @@ export function RestaurantCard({
       <Link href={href} className={clsx('relative block w-34 shrink-0', className)}>
         <div className="relative">
           <RestaurantPhoto photo={card.photo} dish={card.dish} sizes="136px" className="aspect-[4/3]" />
-          {showDistance && (
+          {showDistance && card.distanceLabel && (
             <span className="absolute bottom-1.5 left-1.5 rounded-tag bg-surface/95 px-1.5 py-0.5 text-badge font-semibold">
               {card.distanceLabel}
             </span>
@@ -102,7 +102,7 @@ export function RestaurantCard({
           <p className="line-clamp-2 font-display text-[16px] font-bold leading-snug">{card.name}</p>
           <p className="mt-0.5 flex flex-wrap items-center gap-x-1 text-[13px] text-muted">
             <Rating avg={card.rating.avg} count={card.rating.count} showCount className="text-[13px]" />
-            {showDistance && <span>· {card.distanceLabel}</span>}
+            {showDistance && card.distanceLabel && <span>· {card.distanceLabel}</span>}
             <span>· {card.districtLabel}</span>
           </p>
           <p className="mt-0.5 text-[13px]">
