@@ -20,7 +20,7 @@ export function MapPin({
       aria-label={[card.name, card.dishLabel, card.distanceLabel].filter(Boolean).join(', ')}
       onClick={() => onSelect(card.slug)}
       className={clsx(
-        'relative -translate-x-1/2 -translate-y-full rounded-full border-2 border-line-strong px-2.5 py-1 text-[12px] font-bold whitespace-nowrap transition-transform',
+        'relative -translate-x-1/2 -translate-y-full rounded-full border-2 border-line-strong px-2.5 py-1 text-[12px] font-bold whitespace-nowrap transition-[transform,background-color] duration-200 ease-out',
         selected ? 'z-20 scale-110 bg-xoai text-on-xoai shadow-sticker' : 'z-10 bg-surface text-ink shadow-card',
       )}
     >

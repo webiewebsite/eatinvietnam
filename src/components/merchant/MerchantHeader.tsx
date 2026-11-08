@@ -45,7 +45,7 @@ export function MerchantHeader({ hit }: { hit: RestaurantHit }) {
         </div>
         <h1 className="mt-1.5 font-display text-h1 font-extrabold tracking-[-0.01em]">{r.name}</h1>
 
-        <dl className="mt-3 grid grid-cols-4 divide-x divide-line rounded-input bg-bg py-2 text-center">
+        <dl className="mt-3 grid grid-cols-4 divide-x divide-line rounded-tag bg-bg py-2 text-center">
           <div className="px-1">
             <dt className="sr-only">Đánh giá</dt>
             <dd className="font-display text-[17px] font-extrabold">
@@ -69,7 +69,7 @@ export function MerchantHeader({ hit }: { hit: RestaurantHit }) {
         </dl>
 
         {r.tip && (
-          <details className="group mt-3 rounded-input bg-xoai-soft px-3 py-2">
+          <details className="group mt-3 rounded-tag bg-xoai-soft px-3 py-2">
             <summary className="flex min-h-7 cursor-pointer list-none items-center gap-1 text-[13px]">
               <strong>Mẹo:</strong>
               <span className="truncate group-open:whitespace-normal">{r.tip}</span>

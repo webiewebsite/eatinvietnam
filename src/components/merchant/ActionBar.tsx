@@ -34,7 +34,7 @@ export function ActionBar({
             <a
               href={`tel:${phone}`}
               aria-label={`Gọi ${name}`}
-              className="grid size-12 shrink-0 place-items-center rounded-full border-2 border-line"
+              className="grid size-12 shrink-0 place-items-center rounded-full border border-line"
             >
               <Phone aria-hidden className="size-5" />
             </a>
@@ -43,7 +43,7 @@ export function ActionBar({
             <button
               type="button"
               onClick={() => sheet.current?.showModal()}
-              className="inline-flex h-12 flex-1 items-center justify-center gap-1 rounded-full border-2 border-line-strong bg-surface text-[15px] font-bold"
+              className="inline-flex h-12 flex-1 items-center justify-center gap-1 rounded-full border border-line bg-surface shadow-card text-[15px] font-bold"
             >
               Đặt món <ExternalLink aria-hidden className="size-4" />
             </button>

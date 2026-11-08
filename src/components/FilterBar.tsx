@@ -28,7 +28,7 @@ const QUICK: Record<'results' | 'map', Quick[]> = {
 };
 
 const chip =
-  'inline-flex shrink-0 items-center gap-1 rounded-[10px] border px-3 text-[14px] font-semibold whitespace-nowrap transition-colors';
+  'inline-flex shrink-0 items-center gap-1 rounded-full border px-3.5 text-[14px] font-semibold whitespace-nowrap transition-colors';
 
 /** Quick filter chips + "Lọc" sheet. State lives in URL search params. */
 export function FilterBar({
@@ -56,7 +56,7 @@ export function FilterBar({
             <button
               type="button"
               onClick={() => dialog.current?.showModal()}
-              className={clsx(chip, 'h-[34px] border-line-strong bg-surface')}
+              className={clsx(chip, 'h-9 border-line bg-surface')}
             >
               <SlidersHorizontal aria-hidden className="size-4" />
               Lọc
@@ -70,7 +70,7 @@ export function FilterBar({
               type="button"
               aria-pressed={filters.sort === 'rating'}
               onClick={() => go({ ...filters, sort: filters.sort === 'rating' ? undefined : 'rating' })}
-              className={clsx(chip, 'h-[34px] border-line bg-surface')}
+              className={clsx(chip, 'h-9 border-line bg-surface')}
             >
               <ArrowDownUp aria-hidden className="size-4" />
               {filters.sort === 'rating' ? 'Đánh giá cao' : 'Gần nhất'}
@@ -87,8 +87,8 @@ export function FilterBar({
               onClick={() => go(q.toggle(filters, on))}
               className={clsx(
                 chip,
-                variant === 'map' ? 'h-9 rounded-full shadow-card' : 'h-[34px]',
-                on ? 'border-line-strong bg-xoai text-on-xoai' : 'border-line bg-surface text-ink',
+                variant === 'map' ? 'h-9 shadow-card' : 'h-9',
+                on ? 'border-xoai bg-xoai text-on-xoai' : 'border-line bg-surface text-ink',
               )}
             >
               {q.label}
@@ -134,7 +134,7 @@ export function FilterBar({
               <legend className="mb-2 text-[14px] font-bold">Khu vực</legend>
               <div className="flex flex-wrap gap-2">
                 {[{ slug: '', label: 'Tất cả' }, ...DISTRICTS].map((d) => (
-                  <label key={d.slug} className="has-checked:border-line-strong has-checked:bg-xoai inline-flex h-10 items-center rounded-full border border-line px-3.5 text-[14px] font-semibold">
+                  <label key={d.slug} className="has-checked:border-xoai has-checked:bg-xoai inline-flex h-10 items-center rounded-full border border-line px-3.5 text-[14px] font-semibold">
                     <input type="radio" name="quan" value={d.slug} defaultChecked={(filters.district ?? '') === d.slug} className="sr-only" />
                     {d.label}
                   </label>
@@ -151,7 +151,7 @@ export function FilterBar({
                   { v: 80000, label: '≤ 80k' },
                   { v: 150000, label: '≤ 150k' },
                 ].map((p) => (
-                  <label key={p.v} className="has-checked:border-line-strong has-checked:bg-xoai inline-flex h-10 items-center rounded-full border border-line px-3.5 text-[14px] font-semibold">
+                  <label key={p.v} className="has-checked:border-xoai has-checked:bg-xoai inline-flex h-10 items-center rounded-full border border-line px-3.5 text-[14px] font-semibold">
                     <input type="radio" name="gia" value={p.v} defaultChecked={(filters.priceMax ?? 0) === p.v} className="sr-only" />
                     {p.label}
                   </label>
@@ -162,7 +162,7 @@ export function FilterBar({
               Chỉ quán đang mở
               <input type="checkbox" name="mo" value="1" defaultChecked={!!filters.openNow} className="size-5 accent-thanhlong" />
             </label>
-            <button type="submit" className="sticker h-12 rounded-full bg-thanhlong text-[16px] font-bold text-on-thanhlong">
+            <button type="submit" className="h-12 rounded-full bg-thanhlong text-[16px] font-bold text-on-thanhlong">
               Xem kết quả
             </button>
           </form>

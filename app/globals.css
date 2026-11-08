@@ -92,9 +92,17 @@
   --text-badge: 11px;
   --text-badge--line-height: 14px;
 
+  /* Only 4 radii (P1, 08/11): 8 · 14 · 20 · pill. Inner radius = outer − padding. */
   --radius-tag: 8px;
   --radius-input: 14px;
   --radius-card: 20px;
+
+  /* Motion (P1): ease-out, 200 ms for state changes, 280 ms for larger moves. No bounce. */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 200ms;
+  --duration-base: 280ms;
+  --default-transition-duration: 200ms;
+  --default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
 
   --shadow-sticker: var(--sticker-shadow);
   --shadow-card: 0 1px 2px rgb(28 21 48 / 0.08), 0 8px 24px rgb(28 21 48 / 0.08);
@@ -129,16 +137,16 @@
   }
 }
 
-/* Sticker: 2px ink border + hard 3px shadow. Max 1–2 per screen. Press = stamp. */
+/* Sticker: 2px ink border + hard 3px shadow. ONLY the screen's main CTA: map FAB, "Chỉ đường" (P1, 08/11). */
 @utility sticker {
   border: 2px solid var(--line-strong);
   box-shadow: var(--sticker-shadow);
   transition:
-    transform 150ms ease-out,
-    box-shadow 150ms ease-out;
+    box-shadow 200ms var(--ease-out),
+    filter 200ms var(--ease-out);
   &:active {
-    transform: translate(3px, 3px);
-    box-shadow: none;
+    box-shadow: 1px 1px 0 var(--ink);
+    filter: brightness(0.96);
   }
 }
 

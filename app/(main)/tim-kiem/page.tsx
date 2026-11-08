@@ -76,7 +76,7 @@ export default async function SearchPage({ searchParams }: Props) {
               <Link
                 href={`/tim-kiem${query}${query ? '&' : '?'}trang=${page + 1}`}
                 scroll={false}
-                className="mx-auto inline-flex h-11 items-center rounded-full border-2 border-line-strong bg-surface px-5 font-bold"
+                className="mx-auto inline-flex h-11 items-center rounded-full border border-line bg-surface px-5 font-bold shadow-card"
               >
                 Xem thêm quán
               </Link>

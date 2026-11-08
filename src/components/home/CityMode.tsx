@@ -39,7 +39,7 @@ export function CityMode({ cities, route, regional }: { cities: City[]; route: S
                 {open ? (
                   <Link
                     href="/"
-                    className="sticker flex h-24 w-32 flex-col justify-between rounded-card bg-xoai p-3 text-on-xoai"
+                    className="flex h-24 w-32 flex-col justify-between rounded-card bg-xoai p-3 text-on-xoai shadow-card"
                   >
                     {body}
                   </Link>
@@ -66,7 +66,7 @@ export function CityMode({ cities, route, regional }: { cities: City[]; route: S
               <span
                 aria-hidden
                 className={clsx(
-                  'absolute top-0.5 -left-[31px] grid size-5 place-items-center rounded-full border-2 border-line-strong text-badge font-bold',
+                  'absolute top-0.5 -left-[31px] grid size-5 place-items-center rounded-full border border-line-strong text-badge font-bold',
                   s.city === 'Sài Gòn' ? 'bg-thanhlong text-on-thanhlong' : 'bg-surface',
                 )}
               >

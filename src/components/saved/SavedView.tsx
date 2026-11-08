@@ -92,7 +92,7 @@ export function SavedView({ sharedSlugs, sharedName }: { sharedSlugs: string[]; 
         <button
           type="button"
           onClick={() => createList(sharedName || 'Danh sách được chia sẻ', sharedSlugs)}
-          className="sticker mt-4 flex h-12 w-full items-center justify-center gap-1.5 rounded-full bg-thanhlong font-bold text-on-thanhlong"
+          className="mt-4 flex h-12 w-full items-center justify-center gap-1.5 rounded-full bg-thanhlong font-bold text-on-thanhlong"
         >
           <Plus aria-hidden className="size-5" /> Lưu cả danh sách
         </button>
@@ -115,7 +115,7 @@ export function SavedView({ sharedSlugs, sharedName }: { sharedSlugs: string[]; 
             onClick={() => setTab(t.id)}
             className={clsx(
               'h-10 rounded-full border px-4 text-[14px] font-bold',
-              tab === t.id ? 'border-line-strong bg-xoai text-on-xoai' : 'border-line bg-surface text-muted',
+              tab === t.id ? 'border-xoai bg-xoai text-on-xoai' : 'border-line bg-surface text-muted',
             )}
           >
             {t.label}
@@ -131,7 +131,7 @@ export function SavedView({ sharedSlugs, sharedName }: { sharedSlugs: string[]; 
           <button
             type="button"
             onClick={() => share(store.items.map((i) => i.slug))}
-            className="mt-4 flex h-12 w-full items-center justify-center gap-1.5 rounded-full border-2 border-line-strong bg-surface font-bold"
+            className="mt-4 flex h-12 w-full items-center justify-center gap-1.5 rounded-full border border-line bg-surface shadow-card font-bold"
           >
             <Share2 aria-hidden className="size-4.5" /> Chia sẻ danh sách
           </button>
@@ -241,7 +241,7 @@ function Lists({ lists, items, cards }: { lists: SavedList[]; items: SavedItem[]
           createList(name, items.map((i) => i.slug));
           setName('');
         }}
-        className="flex gap-2 rounded-card border-2 border-dashed border-line p-2"
+        className="flex gap-2 rounded-card border border-dashed border-line p-2"
       >
         <label htmlFor="new-list" className="sr-only">
           Tên danh sách mới

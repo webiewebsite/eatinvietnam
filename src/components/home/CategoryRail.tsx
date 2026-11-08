@@ -20,7 +20,7 @@ export function CategoryRail() {
               props={{ dish: d.slug }}
               className="flex flex-col items-center gap-1 text-center"
             >
-              <span className="grid size-13 place-items-center rounded-full border-2 border-line-strong bg-thanhlong-soft">
+              <span className="grid size-13 place-items-center rounded-full border border-line bg-thanhlong-soft">
                 <FoodIcon slug={d.slug} size={34} />
               </span>
               <span className="line-clamp-2 text-[12px] leading-tight font-medium">{d.label}</span>

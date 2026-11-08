@@ -43,7 +43,7 @@ export function SearchBar({
       className={clsx(
         // The input hides its own outline, so the whole pill carries the focus ring.
         'flex items-center gap-2 bg-surface pr-1.5 pl-3.5 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-thanhlong',
-        variant === 'home' ? 'sticker h-12 rounded-full' : 'h-11 rounded-full border-2 border-line-strong',
+        variant === 'home' ? 'h-12 rounded-full border border-line shadow-card' : 'h-11 rounded-full border border-line',
         variant === 'map' && 'shadow-card',
       )}
     >

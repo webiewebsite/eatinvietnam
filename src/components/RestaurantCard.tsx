@@ -69,9 +69,9 @@ export function RestaurantCard({
     return (
       <Link
         href={href}
-        className={clsx('flex w-[300px] shrink-0 gap-3 rounded-card bg-surface p-2.5 shadow-card', className)}
+        className={clsx('flex w-[300px] shrink-0 gap-3 rounded-card bg-surface p-3 shadow-card', className)}
       >
-        <RestaurantPhoto photo={card.photo} dish={card.dish} sizes="84px" className="size-21 shrink-0" />
+        <RestaurantPhoto photo={card.photo} dish={card.dish} sizes="84px" rounded="rounded-tag" className="size-21 shrink-0" />
         <div className="min-w-0 flex-1 py-0.5">
           <p className="truncate font-display text-[15px] font-bold">{card.name}</p>
           <p className="mt-0.5 flex flex-wrap items-center gap-1 text-[12px] text-muted">

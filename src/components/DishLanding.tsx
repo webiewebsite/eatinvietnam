@@ -72,7 +72,7 @@ export function DishLanding({ dish, district, hits }: { dish: Dish; district?: s
               {hits.length} quán được chọn{typical && ` · giá phổ biến ${typical}`}
             </p>
           </div>
-          <span className="sticker grid size-16 shrink-0 place-items-center rounded-full bg-surface">
+          <span className="grid size-16 shrink-0 place-items-center rounded-full bg-surface shadow-card">
             <FoodIcon slug={dish.slug} size={40} />
           </span>
         </div>
@@ -97,7 +97,7 @@ export function DishLanding({ dish, district, hits }: { dish: Dish; district?: s
               aria-current={on ? 'page' : undefined}
               className={clsx(
                 'inline-flex h-9 shrink-0 items-center rounded-full border px-3.5 text-[14px] font-semibold',
-                on ? 'border-line-strong bg-xoai text-on-xoai' : 'border-line bg-surface',
+                on ? 'border-xoai bg-xoai text-on-xoai' : 'border-line bg-surface',
               )}
             >
               {d.label}
@@ -116,16 +116,16 @@ export function DishLanding({ dish, district, hits }: { dish: Dish; district?: s
               const r = h.restaurant;
               return (
                 <li key={r.slug}>
-                  <Link href={`/quan/${r.slug}`} className="flex items-center gap-3 rounded-card bg-surface p-2.5 shadow-card">
+                  <Link href={`/quan/${r.slug}`} className="flex items-center gap-3 rounded-card bg-surface p-3 shadow-card">
                     <span
                       className={clsx(
                         'grid size-8 shrink-0 place-items-center rounded-full font-display text-[16px] font-extrabold',
-                        i === 0 ? 'sticker bg-xoai text-on-xoai' : 'bg-sunken',
+                        i === 0 ? 'bg-xoai text-on-xoai' : 'bg-sunken',
                       )}
                     >
                       {i + 1}
                     </span>
-                    <RestaurantPhoto photo={r.photos[0]} dish={r.dish} sizes="64px" className="size-16 shrink-0" />
+                    <RestaurantPhoto photo={r.photos[0]} dish={r.dish} sizes="64px" rounded="rounded-tag" className="size-16 shrink-0" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-display text-[16px] font-bold">{r.name}</p>
                       <p className="flex flex-wrap items-center gap-1 text-[13px] text-muted">
@@ -150,7 +150,7 @@ export function DishLanding({ dish, district, hits }: { dish: Dish; district?: s
             href={`/ban-do?mon=${dish.slug}${district ? `&quan=${district}` : ''}`}
             event="map_open"
             props={{ source: 'dish' }}
-            className="mt-3 flex h-12 items-center justify-center gap-1.5 rounded-full border-2 border-line-strong bg-surface font-bold"
+            className="mt-3 flex h-12 items-center justify-center gap-1.5 rounded-full border border-line bg-surface shadow-card font-bold"
           >
             <MapIcon aria-hidden className="size-4.5" /> Xem tất cả trên bản đồ
           </TrackedLink>

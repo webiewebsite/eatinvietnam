@@ -34,7 +34,7 @@ export function ModeSwitch({ mode }: { mode: Mode }) {
             }}
             className={clsx(
               'rounded-full text-[15px] font-bold transition-colors',
-              selected ? 'sticker bg-xoai text-on-xoai' : 'text-muted',
+              selected ? 'bg-surface text-ink shadow-card' : 'text-muted',
               pending && !selected && 'opacity-60',
             )}
           >
