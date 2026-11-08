@@ -72,7 +72,7 @@ export function ReportIssue({ slug, label = 'Báo giá sai', defaultReason = 'pr
               <fieldset className="flex flex-wrap gap-2">
                 <legend className="sr-only">Sai điều gì?</legend>
                 {REASONS.map((r) => (
-                  <label key={r.value} className="has-checked:border-line-strong has-checked:bg-xoai inline-flex h-10 items-center rounded-full border border-line px-3.5 text-[14px] font-semibold">
+                  <label key={r.value} className="has-checked:border-xoai has-checked:bg-xoai inline-flex h-10 items-center rounded-full border border-line px-3.5 text-[14px] font-semibold">
                     <input type="radio" name="reason" value={r.value} defaultChecked={r.value === defaultReason} className="sr-only" />
                     {r.label}
                   </label>

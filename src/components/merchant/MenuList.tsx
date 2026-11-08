@@ -26,7 +26,7 @@ export function MenuList({ items, dish }: { items: MenuItem[]; dish: string }) {
               onClick={() => setGroup(on ? null : g)}
               className={clsx(
                 'inline-flex h-9 shrink-0 items-center rounded-full border px-3.5 text-[14px] font-semibold',
-                on ? 'border-line-strong bg-xoai text-on-xoai' : 'border-line bg-surface',
+                on ? 'border-xoai bg-xoai text-on-xoai' : 'border-line bg-surface',
               )}
             >
               {g} · {count}
