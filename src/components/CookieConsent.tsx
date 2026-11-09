@@ -37,7 +37,7 @@ export function CookieConsent() {
     <section
       role="region"
       aria-label="Cookie thống kê"
-      className="fixed inset-x-0 bottom-[calc(76px+env(safe-area-inset-bottom))] z-40 mx-auto w-[calc(100%-24px)] max-w-[456px] rounded-card border border-line bg-surface p-4 shadow-card"
+      className="fixed inset-x-0 bottom-[calc(96px+env(safe-area-inset-bottom))] z-40 mx-auto w-[calc(100%-24px)] max-w-[456px] rounded-card border border-line bg-surface p-4 shadow-card"
     >
       <p className="text-[14px] leading-snug">
         EatInVietnam muốn dùng Google Analytics để biết tính năng nào hữu ích. Không dùng cho quảng cáo.{' '}
