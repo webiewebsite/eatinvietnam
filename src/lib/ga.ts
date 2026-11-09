@@ -1,7 +1,8 @@
 import { GA_ID, analyticsEnabled } from '@/lib/consent';
 
 type Gtag = (...args: unknown[]) => void;
-type GaWindow = Window & { dataLayer?: unknown[]; gtag?: Gtag } & Record<string, unknown>;
+type GaWindow = { dataLayer?: unknown[]; gtag?: Gtag; [flag: string]: unknown };
+const gaWindow = () => window as unknown as GaWindow;
 
 let loaded = false;
 
@@ -9,7 +10,7 @@ let loaded = false;
 export function loadGa(): void {
   if (loaded || !analyticsEnabled()) return;
   loaded = true;
-  const w = window as GaWindow;
+  const w = gaWindow();
   w[`ga-disable-${GA_ID}`] = false;
   w.dataLayer = w.dataLayer ?? [];
   // gtag must push the `arguments` object itself, not an array copy.
@@ -34,7 +35,7 @@ export function loadGa(): void {
 /** Withdrawal: stop sending and drop the _ga cookies on this domain. */
 export function disableGa(): void {
   if (!analyticsEnabled()) return;
-  const w = window as GaWindow;
+  const w = gaWindow();
   w[`ga-disable-${GA_ID}`] = true;
   w.gtag?.('consent', 'update', { analytics_storage: 'denied' });
   const host = location.hostname.split('.').slice(-2).join('.');
@@ -51,5 +52,5 @@ export function disableGa(): void {
 /** Mirrors an app event to GA4 when it is loaded (consent given). */
 export function gaEvent(name: string, params: Record<string, unknown>): void {
   if (!loaded) return;
-  (window as GaWindow).gtag?.('event', name, params);
+  gaWindow().gtag?.('event', name, params);
 }
