@@ -366,3 +366,30 @@ export const nlQueryCache = mysqlTable(
   },
   (t) => [uniqueIndex('nl_query_cache_uq').on(t.queryNorm, t.taxonomyVersion)],
 );
+
+// ── Newsletter / city waitlist (ops decision D, 09/11) ─────────────────────
+
+/**
+ * People who asked to be emailed (e.g. when a city opens). Kept apart from `events`.
+ * `consent_text` records which wording they agreed to; unsubscribing keeps the row
+ * (so a re-import never re-subscribes them) and only sets `unsubscribed_at`.
+ */
+export const newsletterSubscribers = mysqlTable(
+  'newsletter_subscribers',
+  {
+    id: id(),
+    email: varchar('email', { length: 254 }).notNull(),
+    city: varchar('city', { length: 40 }),
+    source: varchar('source', { length: 40 }).notNull().default('waitlist'),
+    consentText: varchar('consent_text', { length: 40 }).notNull(),
+    consentAt: datetime('consent_at').notNull(),
+    unsubscribeToken: char('unsubscribe_token', { length: 43 }).notNull(),
+    unsubscribedAt: datetime('unsubscribed_at'),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    uniqueIndex('newsletter_email_uq').on(t.email),
+    uniqueIndex('newsletter_token_uq').on(t.unsubscribeToken),
+  ],
+);

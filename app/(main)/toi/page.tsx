@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import type { Metadata } from 'next';
+import { CookieSettingsButton } from '@/components/CookieConsent';
 import { Logo } from '@/components/Logo';
 import { RecentlyViewed } from '@/components/saved/RecentlyViewed';
 
@@ -34,6 +35,7 @@ export default function MePage() {
         >
           Đọc chính sách bảo mật <ChevronRight aria-hidden className="size-4" />
         </Link>
+        <CookieSettingsButton className="mt-2 ml-2 inline-flex h-11 items-center rounded-full px-3 text-[14px] font-semibold text-thanhlong underline" />
       </section>
 
       <section aria-labelledby="feedback">
@@ -42,7 +44,7 @@ export default function MePage() {
         </h2>
         <p className="mt-1 text-[14px] text-muted">Thấy quán ngon mà chưa có, hay thông tin sai? Báo cho đội biên tập.</p>
         <a
-          href="mailto:hello@eatinvietnam.com?subject=G%C3%B3p%20%C3%BD%20EatInVietnam"
+          href="mailto:hello@eatinvietnam.online?subject=G%C3%B3p%20%C3%BD%20EatInVietnam"
           className="mt-2 inline-flex h-11 items-center rounded-full bg-ink px-5 font-bold text-surface"
         >
           Gửi góp ý

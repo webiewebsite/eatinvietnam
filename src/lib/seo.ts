@@ -5,7 +5,7 @@ import { dishLabel, districtLabel, getDish, getGroup } from '@/lib/taxonomy';
 export const SITE_NAME = 'EatInVietnam';
 export const SITE_TAGLINE = 'Ăn ngon, đúng chất Việt';
 
-export const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://eatinvietnam.com').replace(/\/$/, '');
+export const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://eatinvietnam.online').replace(/\/$/, '');
 
 /** Minimum verified restaurants before a dish/district landing page may be indexed (thin-content guard). */
 export const MIN_INDEXABLE = 3;

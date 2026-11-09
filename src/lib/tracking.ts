@@ -1,3 +1,5 @@
+import { gaEvent } from '@/lib/ga';
+
 /** Event names allowed by /api/events. Keep in sync with app/api/events/route.ts. */
 export const EVENT_NAMES = [
   'search',
@@ -42,6 +44,8 @@ export function track(name: EventName, props: Props = {}): void {
     } else {
       void fetch('/api/events', { method: 'POST', body, keepalive: true, headers: { 'content-type': 'application/json' } });
     }
+    // Same event to GA4 — a no-op unless the visitor accepted analytics cookies.
+    gaEvent(name, props);
   } catch {
     // Tracking must never break the UI.
   }
