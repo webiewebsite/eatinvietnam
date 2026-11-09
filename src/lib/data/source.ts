@@ -7,7 +7,7 @@ export type DataSourceKind = 'demo' | 'db';
  * Database when DATABASE_URL is set, demo data otherwise. DATA_SOURCE=demo forces
  * demo data even with a database (escape hatch in hPanel if the DB misbehaves).
  */
-export function dataSourceKind(env: NodeJS.ProcessEnv = process.env): DataSourceKind {
+export function dataSourceKind(env: { DATABASE_URL?: string; DATA_SOURCE?: string } = process.env): DataSourceKind {
   if (env.DATA_SOURCE === 'demo') return 'demo';
   return env.DATABASE_URL ? 'db' : 'demo';
 }

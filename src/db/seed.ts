@@ -195,7 +195,9 @@ export async function backfillDemo(db: Db): Promise<{ updated: number; message: 
         .where(and(eq(restaurants.id, row.id), isNull(restaurants.features)));
       touched = true;
     }
-    if (!withPhotos.has(row.id)) {
+    // Some demo restaurants have no photos at all: those are never "missing" any.
+    const demoHasPhotos = demo.photos.length > 0 || demo.menu.some((m) => m.photo);
+    if (demoHasPhotos && !withPhotos.has(row.id)) {
       await insertPhotosAndMenu(db, row.id, demo, false);
       touched = true;
     }

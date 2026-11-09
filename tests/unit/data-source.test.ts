@@ -4,12 +4,12 @@ import { countAll, getCardsBySlugs, listIndex, listSlugs, topForDish } from '@/l
 
 describe('data source selection (#6)', () => {
   it('reads the database whenever DATABASE_URL is set', () => {
-    expect(dataSourceKind({} as NodeJS.ProcessEnv)).toBe('demo');
-    expect(dataSourceKind({ DATABASE_URL: 'mysql://u:p@h/db' } as NodeJS.ProcessEnv)).toBe('db');
+    expect(dataSourceKind({})).toBe('demo');
+    expect(dataSourceKind({ DATABASE_URL: 'mysql://u:p@h/db' })).toBe('db');
   });
 
   it('DATA_SOURCE=demo forces demo data even with a database', () => {
-    expect(dataSourceKind({ DATABASE_URL: 'mysql://u:p@h/db', DATA_SOURCE: 'demo' } as NodeJS.ProcessEnv)).toBe('demo');
+    expect(dataSourceKind({ DATABASE_URL: 'mysql://u:p@h/db', DATA_SOURCE: 'demo' })).toBe('demo');
   });
 });
 
