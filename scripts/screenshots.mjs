@@ -17,6 +17,9 @@ const ROUTES = [
   ['07-toi', '/toi'],
   ['08-chinh-sach', '/chinh-sach-bao-mat'],
   ['09-quan-chua-cap-nhat', '/quan/che-co-sau'],
+  // CI builds with a fake NEXT_PUBLIC_GA_ID so the cookie banner renders; it is pre-dismissed elsewhere.
+  ['10-cookie-banner', '/toi?_shot=cookie'],
+  ['11-huy-dang-ky', '/huy-dang-ky?token=' + 'a'.repeat(43)],
 ];
 
 const VIEWPORTS = [
@@ -40,6 +43,9 @@ for (const vp of VIEWPORTS) {
   // Seed saved restaurants so /da-luu is not empty.
   await context.addInitScript(() => {
     try {
+      // localStorage is shared by every page of the context, so clear it explicitly for the banner shot.
+      if (location.search.includes('_shot=cookie')) localStorage.removeItem('eiv:consent');
+      else localStorage.setItem('eiv:consent', 'denied');
       localStorage.setItem(
         'eiv:saved',
         JSON.stringify([

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Be_Vietnam_Pro, Bricolage_Grotesque } from 'next/font/google';
+import { CookieConsent } from '@/components/CookieConsent';
 import { SITE_NAME, SITE_TAGLINE, siteUrl } from '@/lib/seo';
 import './globals.css';
 
@@ -37,7 +38,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" data-theme="light" className={`${display.variable} ${sans.variable}`}>
-      <body className="min-h-dvh antialiased">{children}</body>
+      <body className="min-h-dvh antialiased">
+        {children}
+        <CookieConsent />
+      </body>
     </html>
   );
 }
