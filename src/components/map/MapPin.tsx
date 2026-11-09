@@ -1,7 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import type { CardData } from '@/lib/restaurants';
+import type { CardData } from '@/lib/cards';
 
 /** Dish-label pin. Selected = bigger, mango sticker with rating; others = white pill. */
 export function MapPin({

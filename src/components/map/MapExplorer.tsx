@@ -12,7 +12,7 @@ import { distanceFields } from '@/lib/distance';
 import { inBBox, type BBox } from '@/lib/geo';
 import { useLocationConsent } from '@/components/LocationConsent';
 import { useViewerLocation, wasLocationDeclined } from '@/lib/location-client';
-import type { CardData } from '@/lib/restaurants';
+import type { CardData } from '@/lib/cards';
 import { track } from '@/lib/tracking';
 import type { SearchFilters } from '@/lib/types';
 

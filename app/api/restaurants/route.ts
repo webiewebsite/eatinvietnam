@@ -17,7 +17,7 @@ export async function GET(req: Request) {
   if (!parsed.success) {
     return Response.json({ error: { code: 'invalid_query', message: 'slugs must be a comma-separated list (max 50)' } }, { status: 400 });
   }
-  const items = getCardsBySlugs(parsed.data.slugs, await getViewerLocation(), currentDate());
+  const items = await getCardsBySlugs(parsed.data.slugs, await getViewerLocation(), currentDate());
   // Distances depend on the viewer's cookie: never share a cached response between viewers.
   return Response.json({ items }, { headers: { 'cache-control': 'private, no-store' } });
 }

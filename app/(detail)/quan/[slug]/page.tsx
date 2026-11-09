@@ -12,7 +12,7 @@ import { ViewTracker } from '@/components/merchant/ViewTracker';
 import { Rating } from '@/components/ui/Rating';
 import { formatDate, formatPrice, formatPriceRange } from '@/lib/format';
 import { currentDate, hoursSummary } from '@/lib/hours';
-import { getHit, getRestaurant, listSlugs } from '@/lib/restaurants';
+import { getHit, getRestaurant } from '@/lib/restaurants';
 import { breadcrumbJsonLd, clamp, jsonLdString, restaurantBreadcrumb, restaurantJsonLd } from '@/lib/seo';
 import { dishLabel, districtLabel } from '@/lib/taxonomy';
 import { isVerificationOverdue } from '@/lib/verification';
@@ -20,14 +20,16 @@ import { isVerificationOverdue } from '@/lib/verification';
 // ISR: admin saves call revalidatePath('/quan/<slug>') (issue #8).
 export const revalidate = 3600;
 
-export function generateStaticParams() {
-  return listSlugs().map((slug) => ({ slug }));
+export function generateStaticParams(): { slug: string }[] {
+  // Rendered on the first request, then cached by ISR: never read data during `next build`
+  // (the build may not see DATABASE_URL, and pages built from demo data would be served for an hour).
+  return [];
 }
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const r = getRestaurant((await params).slug);
+  const r = await getRestaurant((await params).slug);
   if (!r) return {};
   const price = formatPriceRange(r.priceMin, r.priceMax);
   return {
@@ -51,7 +53,7 @@ const TABS = [
 export default async function RestaurantPage({ params }: Props) {
   const { slug } = await params;
   // ISR: no viewer location on the server; DistanceStat computes it client-side from the same cookie.
-  const hit = getHit(slug, null, currentDate());
+  const hit = await getHit(slug, null, currentDate());
   if (!hit) notFound();
   const r = hit.restaurant;
   // ISR: revalidated hourly, so the overdue flag is at most an hour late.

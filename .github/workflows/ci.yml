@@ -141,11 +141,30 @@ jobs:
           MIGRATE_ON_START: '1'
           SEED_DEMO_IF_EMPTY: '1'
       - run: npm run db:smoke
+      # Issue #6: every read the pages make gives the same answer from the DB as from the demo list.
+      - run: npm run db:parity
       # Second boot must be a no-op (idempotent migrate, seed skipped on a non-empty DB).
       - run: npm run db:boot 2>&1 | tee boot2.log && grep -q 'demo seed skipped' boot2.log
         env:
           MIGRATE_ON_START: '1'
           SEED_DEMO_IF_EMPTY: '1'
+      # Staging was seeded on 09/11, before photos/features lived in the DB. Recreate that state:
+      # the boot hook must fill it in once, then do nothing, and the data must match the demo list.
+      - name: Backfill a database seeded before #6
+        env:
+          MIGRATE_ON_START: '1'
+          SEED_DEMO_IF_EMPTY: '1'
+        run: |
+          node -e "
+            const m=require('mysql2/promise');
+            (async()=>{const c=await m.createConnection(process.env.DATABASE_URL);
+            await c.query('UPDATE menu_items SET photo_id = NULL');
+            await c.query('DELETE FROM photos');
+            await c.query('UPDATE restaurants SET features = NULL, amenities = NULL');
+            await c.end();})().catch(e=>{console.error(e);process.exit(1)})"
+          npm run db:boot 2>&1 | tee boot3.log && grep -q 'demo backfill: 14 restaurants updated' boot3.log
+          npm run db:boot 2>&1 | tee boot4.log && grep -q 'demo backfill: nothing to do' boot4.log
+          npm run db:parity
       # The real Hostinger path: Next server start → instrumentation.ts → bootDatabase().
       - name: Boot hook inside the built Next server
         if: matrix.engine == 'mariadb:11.8'
@@ -153,7 +172,8 @@ jobs:
           MIGRATE_ON_START: '1'
           SEED_DEMO_IF_EMPTY: '1'
         run: |
-          npm run build
+          # The build must not read restaurants (ISR renders on first request): a dead DB proves it.
+          DATABASE_URL=mysql://root:root@127.0.0.1:3999/unreachable npm run build
           npm start -- -p 3100 > server.log 2>&1 &
           npx --yes wait-on@8 http://localhost:3100/api/health --timeout 90000
           sleep 2
@@ -162,6 +182,33 @@ jobs:
           grep -q 'demo seed skipped' server.log
           curl -fsS http://localhost:3100/api/health | tee health.json
           grep -q '"restaurants":14' health.json
+          grep -q '"dataSource":"db"' health.json
+      - name: Pages read the database (#6)
+        if: matrix.engine == 'mariadb:11.8'
+        run: |
+          # A change made only in the DB must show on every page type, so nothing is served from demo data.
+          node -e "
+            const m=require('mysql2/promise');
+            (async()=>{const c=await m.createConnection(process.env.DATABASE_URL);
+            await c.query(\"UPDATE restaurants SET name = 'Bún bò CI từ DB' WHERE slug = 'bun-bo-ganh-me-hoa'\");
+            await c.end();})().catch(e=>{console.error(e);process.exit(1)})"
+          page() { curl -fsS "http://localhost:3100$1" -o page.html && grep -q "$2" page.html || { echo "::error::$1 does not show '$2'"; exit 1; }; }
+          page '/' 'Bún bò CI từ DB'
+          page '/tim-kiem?q=bun+bo' 'Bún bò CI từ DB'
+          page '/ban-do?q=bun+bo' 'Bún bò CI từ DB'
+          page '/quan/bun-bo-ganh-me-hoa' 'Bún bò CI từ DB'
+          page '/mon/bun-bo' 'Bún bò CI từ DB'
+          page '/khu-vuc/quan-1' 'Bún bò CI từ DB'
+          page '/api/restaurants?slugs=bun-bo-ganh-me-hoa' 'Bún bò CI từ DB'
+          page '/sitemap.xml' '/quan/bun-bo-ganh-me-hoa'
+          # Drafts stay hidden.
+          node -e "
+            const m=require('mysql2/promise');
+            (async()=>{const c=await m.createConnection(process.env.DATABASE_URL);
+            await c.query(\"UPDATE restaurants SET status = 'draft' WHERE slug = 'com-tam-suon-moc'\");
+            await c.end();})().catch(e=>{console.error(e);process.exit(1)})"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3100/quan/com-tam-suon-moc)" = 404
+          if curl -fsS 'http://localhost:3100/tim-kiem?q=com+tam' | grep -q '/quan/com-tam-suon-moc'; then echo '::error::draft listed in search'; exit 1; fi
       - name: Newsletter sign-up + unsubscribe against the real DB
         if: matrix.engine == 'mariadb:11.8'
         run: |

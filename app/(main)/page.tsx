@@ -37,15 +37,21 @@ export default async function HomePage({ searchParams }: Props) {
   );
 }
 
-function NearMode({ now, origin }: { now: Date; origin: LatLng | null }) {
+async function NearMode({ now, origin }: { now: Date; origin: LatLng | null }) {
   // Without the viewer's location these lists are editorial picks, not "near you".
-  const near = nearby(origin, 8, now).map((h) => toCard(h, now));
-  const late = lateNight(origin, 4, now).map((h) => toCard(h, now));
+  const [nearHits, lateHits, openCount, totalCount] = await Promise.all([
+    nearby(origin, 8, now),
+    lateNight(origin, 4, now),
+    countOpen(now),
+    countAll(),
+  ]);
+  const near = nearHits.map((h) => toCard(h, now));
+  const late = lateHits.map((h) => toCard(h, now));
 
   return (
     <div className="flex flex-col gap-6">
       <CategoryRail />
-      <PromoCarousel slides={home.promos.slice(0, 3)} openCount={countOpen(now)} totalCount={countAll()} />
+      <PromoCarousel slides={home.promos.slice(0, 3)} openCount={openCount} totalCount={totalCount} />
       <TimeSuggest now={now} />
 
       <section aria-labelledby="near">

@@ -2,6 +2,7 @@ import { count, sql } from 'drizzle-orm';
 import { bootDatabase, errorCode } from '@/db/boot';
 import { getDb } from '@/db/client';
 import { restaurants } from '@/db/schema';
+import { dataSourceKind } from '@/lib/data/source';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +13,8 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET() {
   const boot = await bootDatabase();
-  const db: Record<string, unknown> = { configured: boot.databaseUrl === 'set', boot };
+  // Where pages read restaurants from: 'db' when DATABASE_URL is set (unless DATA_SOURCE=demo).
+  const db: Record<string, unknown> = { configured: boot.databaseUrl === 'set', dataSource: dataSourceKind(), boot };
 
   if (boot.databaseUrl === 'set') {
     const conn = getDb();

@@ -57,7 +57,8 @@ export interface Restaurant {
   phone?: string;
   grabUrl?: string;
   shopeeUrl?: string;
-  isDemo: true;
+  /** Fictional demo data (src/data/demo-restaurants.ts). Rows read from the database leave it unset. */
+  isDemo?: true;
 }
 
 export interface SearchFilters {

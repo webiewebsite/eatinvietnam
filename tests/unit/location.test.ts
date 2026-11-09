@@ -24,29 +24,29 @@ describe('location cookie', () => {
 });
 
 describe('single distance source', () => {
-  it('no origin → no distance anywhere', () => {
+  it('no origin → no distance anywhere', async () => {
     expect(distanceFields(null, binhTan)).toEqual({ distance: null, distanceLabel: null });
-    const cards = nearby(null, 20, noon);
+    const cards = await nearby(null, 20, noon);
     expect(cards.every((h) => h.distance == null && h.distanceLabel == null)).toBe(true);
   });
 
-  it('same origin → same label on list, map recompute and slug lookup', () => {
+  it('same origin → same label on list, map recompute and slug lookup', async () => {
     const origin = parseLocCookie(formatLocCookie(binhTan));
-    const fromList = searchRestaurants({ terms: [], dishes: [] }, { origin, now: noon, limit: 50 }).items.find(
+    const fromList = (await searchRestaurants({ terms: [], dishes: [] }, { origin, now: noon, limit: 50 })).items.find(
       (h) => h.restaurant.slug === 'chao-ech-dem-sai-gon',
     );
-    const [fromApi] = getCardsBySlugs(['chao-ech-dem-sai-gon'], origin, noon);
+    const [fromApi] = await getCardsBySlugs(['chao-ech-dem-sai-gon'], origin, noon);
     const fromMap = distanceFields(origin, { lat: fromApi!.lat, lng: fromApi!.lng });
     expect(fromList?.distanceLabel).toBe(fromApi?.distanceLabel);
     expect(fromMap.distanceLabel).toBe(fromApi?.distanceLabel);
   });
 
-  it('radius filter is ignored (and reported) without an origin', () => {
+  it('radius filter is ignored (and reported) without an origin', async () => {
     const f = parseQuery('món nước gần đây');
-    const withoutLoc = searchRestaurants(f, { origin: null, now: noon, limit: 50 });
+    const withoutLoc = await searchRestaurants(f, { origin: null, now: noon, limit: 50 });
     expect(withoutLoc.radiusIgnored).toBe(true);
     expect(withoutLoc.total > 0).toBe(true);
-    const farAway = searchRestaurants(f, { origin: { lat: 10.9, lng: 106.5 }, now: noon, limit: 50 });
+    const farAway = await searchRestaurants(f, { origin: { lat: 10.9, lng: 106.5 }, now: noon, limit: 50 });
     expect(farAway.radiusIgnored).toBe(false);
     expect(farAway.total).toBe(0);
   });
@@ -61,10 +61,10 @@ describe('re-verification (decision #6)', () => {
     expect(isVerificationOverdue('not-a-date', noon)).toBe(true);
   });
 
-  it('lists overdue demo restaurants and flags their cards', () => {
-    expect(overdueForReverification(noon).map((r) => r.slug)).toEqual(['che-co-sau']);
-    const [stale] = getCardsBySlugs(['che-co-sau'], null, noon);
-    const [fresh] = getCardsBySlugs(['com-tam-suon-moc'], null, noon);
+  it('lists overdue demo restaurants and flags their cards', async () => {
+    expect((await overdueForReverification(noon)).map((r) => r.slug)).toEqual(['che-co-sau']);
+    const [stale] = await getCardsBySlugs(['che-co-sau'], null, noon);
+    const [fresh] = await getCardsBySlugs(['com-tam-suon-moc'], null, noon);
     expect(stale?.stale).toBe(true);
     expect(fresh?.stale).toBe(false);
   });

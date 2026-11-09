@@ -4,7 +4,7 @@ import { RestaurantPhoto } from '@/components/RestaurantPhoto';
 import { SaveButton } from '@/components/SaveButton';
 import { Rating } from '@/components/ui/Rating';
 import { Tag } from '@/components/ui/Tag';
-import { OPEN_TONE_CLASS, type CardData } from '@/lib/restaurants';
+import { OPEN_TONE_CLASS, type CardData } from '@/lib/cards';
 
 type Variant = 'rail' | 'grid' | 'row' | 'map';
 

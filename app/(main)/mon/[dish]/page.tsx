@@ -4,12 +4,14 @@ import { DishLanding, getDishCopy } from '@/components/DishLanding';
 import { currentDate } from '@/lib/hours';
 import { topForDish } from '@/lib/restaurants';
 import { MIN_INDEXABLE, clamp } from '@/lib/seo';
-import { DISHES, getDish } from '@/lib/taxonomy';
+import { getDish } from '@/lib/taxonomy';
 
 export const revalidate = 3600;
 
-export function generateStaticParams() {
-  return DISHES.map((d) => ({ dish: d.slug }));
+export function generateStaticParams(): { dish: string }[] {
+  // Rendered on the first request, then cached by ISR: never read data during `next build`
+  // (the build may not see DATABASE_URL, and pages built from demo data would be served for an hour).
+  return [];
 }
 
 type Props = { params: Promise<{ dish: string }> };
@@ -17,7 +19,7 @@ type Props = { params: Promise<{ dish: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const dish = getDish((await params).dish);
   if (!dish) return {};
-  const count = topForDish(dish.slug).length;
+  const count = (await topForDish(dish.slug)).length;
   const copy = getDishCopy(dish);
   return {
     title: clamp(copy.title, 60),
@@ -31,5 +33,5 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DishPage({ params }: Props) {
   const dish = getDish((await params).dish);
   if (!dish) notFound();
-  return <DishLanding dish={dish} hits={topForDish(dish.slug, undefined, currentDate())} />;
+  return <DishLanding dish={dish} hits={await topForDish(dish.slug, undefined, currentDate())} />;
 }

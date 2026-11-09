@@ -1,21 +1,23 @@
 /**
  * Demo seed shared by `npm run db:seed` and the staging boot hook (src/db/boot.ts).
  */
-import { count } from 'drizzle-orm';
+import { and, count, eq, inArray, isNull } from 'drizzle-orm';
 import { DEMO_RESTAURANTS } from '@/data/demo-restaurants';
 import type { getDb } from '@/db/client';
 import {
   areas,
   menuItems,
   openingHours,
+  photos,
   restaurantAreas,
   restaurantTags,
   restaurants,
   roles,
   tags,
 } from '@/db/schema';
-import { toStoredSearchText } from '@/lib/search/normalize';
-import { DISHES, dishLabel, districtLabel } from '@/lib/taxonomy';
+import { demoSearchText } from '@/lib/data/demo';
+import { DISHES } from '@/lib/taxonomy';
+import type { Photo, Restaurant } from '@/lib/types';
 import { reverifyDueAt } from '@/lib/verification';
 import taxonomy from '@content/taxonomy.json';
 
@@ -37,6 +39,49 @@ const LEGACY = [
 ];
 
 type Db = ReturnType<typeof getDb>;
+
+const photoRow = (restaurantId: number, p: Photo, kind: 'gallery' | 'menu', sortOrder: number) => ({
+  restaurantId,
+  kind,
+  externalUrl: p.src,
+  width: p.width,
+  height: p.height,
+  alt: p.alt,
+  credit: p.credit?.name ?? null,
+  creditUrl: p.credit?.url ?? null,
+  sortOrder,
+});
+
+/** Gallery photos, then one `menu` photo per menu item that has one (linked via photo_id). */
+async function insertPhotosAndMenu(db: Db, restaurantId: number, r: Restaurant, withMenu: boolean) {
+  if (r.photos.length) {
+    await db.insert(photos).values(r.photos.map((p, i) => photoRow(restaurantId, p, 'gallery', i)));
+  }
+  for (const [i, m] of r.menu.entries()) {
+    let photoId: number | null = null;
+    if (m.photo) {
+      const [res] = await db.insert(photos).values(photoRow(restaurantId, m.photo, 'menu', i));
+      photoId = Number(res.insertId);
+    }
+    if (withMenu) {
+      await db.insert(menuItems).values({
+        restaurantId,
+        groupName: m.group,
+        name: m.name,
+        description: m.desc ?? null,
+        price: m.price,
+        mustTry: !!m.mustTry,
+        photoId,
+        sortOrder: i,
+      });
+    } else if (photoId != null) {
+      await db
+        .update(menuItems)
+        .set({ photoId })
+        .where(and(eq(menuItems.restaurantId, restaurantId), eq(menuItems.sortOrder, i), eq(menuItems.name, m.name)));
+    }
+  }
+}
 
 /**
  * Seeds roles, areas, tags and the 14 demo restaurants — ONLY into an empty database.
@@ -82,20 +127,14 @@ export async function seedDemo(db: Db): Promise<{ seeded: boolean; existing: num
       ratingCount: r.rating.count,
       editorPick: r.editorPick,
       highlight: r.highlight,
+      features: r.features,
+      amenities: r.amenities,
       tip: r.tip ?? null,
       busyHint: r.busyHint ?? null,
       phone: r.phone ?? null,
       grabUrl: r.grabUrl ?? null,
       shopeeUrl: r.shopeeUrl ?? null,
-      searchText: toStoredSearchText(
-        r.name,
-        r.dishes.map(dishLabel).join(' '),
-        districtLabel(r.district),
-        r.venueType,
-        r.highlight,
-        r.features.join(' '),
-        r.menu.map((m) => m.name).join(' '),
-      ),
+      searchText: demoSearchText(r),
       verifiedAt: new Date(r.verifiedAt),
       reverifyDueAt: reverifyDueAt(r.verifiedAt),
     });
@@ -115,19 +154,7 @@ export async function seedDemo(db: Db): Promise<{ seeded: boolean; existing: num
         r.hours.map((h) => ({ restaurantId, day: h.day, opensAt: `${h.open}:00`, closesAt: `${h.close}:00` })),
       );
     }
-    if (r.menu.length) {
-      await db.insert(menuItems).values(
-        r.menu.map((m, i) => ({
-          restaurantId,
-          groupName: m.group,
-          name: m.name,
-          description: m.desc ?? null,
-          price: m.price,
-          mustTry: !!m.mustTry,
-          sortOrder: i,
-        })),
-      );
-    }
+    await insertPhotosAndMenu(db, restaurantId, r, true);
   }
 
   return {
@@ -135,4 +162,44 @@ export async function seedDemo(db: Db): Promise<{ seeded: boolean; existing: num
     existing: 0,
     message: `Seeded ${DEMO_RESTAURANTS.length} demo restaurants, ${LEGACY.length} areas, ${DISHES.length + VIBES.length} tags (taxonomy groups: ${taxonomy.groups.length}).`,
   };
+}
+
+/**
+ * Staging was seeded on 09/11 before restaurants had features/amenities and before
+ * photos could hold demo URLs. When the database still holds ONLY demo restaurants,
+ * fill in what is missing; restaurants that already have it are left alone (idempotent).
+ * Once any non-demo restaurant exists, this never touches anything.
+ */
+export async function backfillDemo(db: Db): Promise<{ updated: number; message: string }> {
+  const demoBySlug = new Map(DEMO_RESTAURANTS.map((r) => [r.slug, r]));
+  const rows = await db
+    .select({ id: restaurants.id, slug: restaurants.slug, features: restaurants.features })
+    .from(restaurants);
+  if (!rows.length || rows.some((r) => !demoBySlug.has(r.slug))) {
+    return { updated: 0, message: 'demo backfill skipped (database holds non-demo restaurants).' };
+  }
+
+  const ids = rows.map((r) => r.id);
+  const withPhotos = new Set(
+    (await db.selectDistinct({ rid: photos.restaurantId }).from(photos).where(inArray(photos.restaurantId, ids))).map((p) => p.rid),
+  );
+
+  let updated = 0;
+  for (const row of rows) {
+    const demo = demoBySlug.get(row.slug)!;
+    let touched = false;
+    if (row.features == null) {
+      await db
+        .update(restaurants)
+        .set({ features: demo.features, amenities: demo.amenities, searchText: demoSearchText(demo) })
+        .where(and(eq(restaurants.id, row.id), isNull(restaurants.features)));
+      touched = true;
+    }
+    if (!withPhotos.has(row.id)) {
+      await insertPhotosAndMenu(db, row.id, demo, false);
+      touched = true;
+    }
+    if (touched) updated++;
+  }
+  return { updated, message: updated ? `demo backfill: ${updated} restaurants updated.` : 'demo backfill: nothing to do.' };
 }
