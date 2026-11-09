@@ -8,7 +8,7 @@ import { RestaurantPhoto } from '@/components/RestaurantPhoto';
 import { SaveButton } from '@/components/SaveButton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { RowSkeleton } from '@/components/ui/Skeleton';
-import { OPEN_TONE_CLASS, type CardData } from '@/lib/restaurants';
+import { OPEN_TONE_CLASS, type CardData } from '@/lib/cards';
 import {
   createList,
   deleteList,

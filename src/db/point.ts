@@ -37,8 +37,13 @@ export const latOf = (column: unknown) => sql<number>`ST_Y(${column})`.mapWith(N
 export const distanceTo = (column: unknown, p: LatLng) =>
   sql<number>`ST_Distance_Sphere(${column}, ${pointSql(p)})`.mapWith(Number);
 
-/** Bounding-box pre-filter that can use the SPATIAL INDEX. */
+/**
+ * Bounding-box pre-filter that can use the SPATIAL INDEX. MBRIntersects (not MBRContains)
+ * so a point exactly on the edge counts, like lib/geo inBBox; for a point the two only
+ * differ on the boundary.
+ */
 export function withinBox(column: unknown, b: { minLat: number; maxLat: number; minLng: number; maxLng: number }): SQL {
+  for (const v of [b.minLat, b.maxLat, b.minLng, b.maxLng]) if (!Number.isFinite(v)) throw new Error('Invalid bbox');
   const ring = `POLYGON((${b.minLng} ${b.minLat}, ${b.maxLng} ${b.minLat}, ${b.maxLng} ${b.maxLat}, ${b.minLng} ${b.maxLat}, ${b.minLng} ${b.minLat}))`;
-  return sql`MBRContains(ST_GeomFromText(${ring}), ${column})`;
+  return sql`MBRIntersects(ST_GeomFromText(${ring}), ${column})`;
 }

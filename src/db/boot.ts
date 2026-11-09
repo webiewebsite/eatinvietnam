@@ -1,22 +1,23 @@
 /**
  * Database bootstrap for Hostinger staging (the DB only listens on 127.0.0.1).
  *   MIGRATE_ON_START=1     apply pending migrations (drizzle tracks what ran; idempotent)
- *   SEED_DEMO_IF_EMPTY=1   load the 14 demo restaurants if `restaurants` is empty
- * Runs from instrumentation.ts at server start AND lazily from /api/health, so it
- * still happens if the host never calls the instrumentation hook. Never throws.
- * Production leaves both flags unset and migrates as a deliberate release step.
+ *   SEED_DEMO_IF_EMPTY=1   load the 14 demo restaurants if `restaurants` is empty, or fill
+ *                          in demo fields added later when the DB still holds only demo data
+ * Runs from instrumentation.ts at server start, lazily from /api/health, and before the
+ * first query of the DB data source (lib/data/db.ts), so pages never read a half-migrated
+ * schema. Never throws. Production leaves both flags unset and migrates as a release step.
  */
 import path from 'node:path';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
 import { getDb } from './client';
-import { seedDemo } from './seed';
+import { backfillDemo, seedDemo } from './seed';
 
 export const MIGRATIONS_FOLDER = path.join(process.cwd(), 'src', 'db', 'migrations');
 
 export interface BootReport {
   databaseUrl: 'set' | 'missing';
   migrate: 'off' | 'ok' | `error: ${string}`;
-  seed: 'off' | 'seeded' | 'skipped' | `error: ${string}`;
+  seed: 'off' | 'seeded' | 'skipped' | 'backfilled' | `error: ${string}`;
   at: string;
 }
 
@@ -48,7 +49,8 @@ async function run(env: NodeJS.ProcessEnv): Promise<BootReport> {
       console.warn(`[db] migrations up to date (${Date.now() - t} ms)`);
     } catch (e) {
       report.migrate = `error: ${errorCode(e)}`;
-      console.error('[db] migration failed — fix and redeploy; app keeps serving demo data', e);
+      // Pages reading the DB will error until this is fixed; DATA_SOURCE=demo in hPanel is the stopgap.
+      console.error('[db] migration failed — fix and redeploy (or set DATA_SOURCE=demo meanwhile)', e);
       return report; // never seed on top of a half-migrated schema
     }
   }
@@ -58,6 +60,11 @@ async function run(env: NodeJS.ProcessEnv): Promise<BootReport> {
       const r = await seedDemo(db);
       report.seed = r.seeded ? 'seeded' : 'skipped';
       console.warn(`[db] ${r.message}`);
+      if (!r.seeded) {
+        const b = await backfillDemo(db);
+        if (b.updated) report.seed = 'backfilled';
+        console.warn(`[db] ${b.message}`);
+      }
     } catch (e) {
       report.seed = `error: ${errorCode(e)}`;
       console.error('[db] demo seed failed', e);

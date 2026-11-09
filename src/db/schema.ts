@@ -182,6 +182,10 @@ export const restaurants = mysqlTable(
     ratingCount: int('rating_count', { unsigned: true }).notNull().default(0),
     editorPick: boolean('editor_pick').notNull().default(false),
     highlight: varchar('highlight', { length: 160 }).notNull().default(''),
+    /** Short editorial notes shown as chips ("Nước dùng đậm"). JSON string[]; MariaDB stores JSON as LONGTEXT. */
+    features: json('features').$type<string[]>(),
+    /** Practical facts ("Có máy lạnh", "Có chỗ gửi xe máy"). JSON string[]. */
+    amenities: json('amenities').$type<string[]>(),
     tip: varchar('tip', { length: 255 }),
     busyHint: varchar('busy_hint', { length: 60 }),
     phone: varchar('phone', { length: 20 }),
@@ -290,12 +294,17 @@ export const photos = mysqlTable(
     restaurantId: ref('restaurant_id')
       .notNull()
       .references(() => restaurants.id, { onDelete: 'cascade' }),
-    /** R2 key of the largest size: restaurants/<id>/<uuid>-1440.webp */
-    r2Key: varchar('r2_key', { length: 255 }).notNull(),
+    /** R2 key of the largest size: restaurants/<id>/<uuid>-1440.webp. Null for hot-linked demo photos. */
+    r2Key: varchar('r2_key', { length: 255 }),
+    /** Hot-linked image (demo data on Pexels). Real photos are uploaded to R2 (#8) and leave this null. */
+    externalUrl: varchar('external_url', { length: 500 }),
+    /** gallery = restaurant photos; menu = only shown next to a menu item. */
+    kind: mysqlEnum('kind', ['gallery', 'menu']).notNull().default('gallery'),
     width: smallint('width', { unsigned: true }).notNull(),
     height: smallint('height', { unsigned: true }).notNull(),
     alt: varchar('alt', { length: 200 }).notNull(),
     credit: varchar('credit', { length: 200 }),
+    creditUrl: varchar('credit_url', { length: 500 }),
     sortOrder: smallint('sort_order').notNull().default(0),
     createdBy: ref('created_by').references(() => users.id, { onDelete: 'set null' }),
     createdAt: createdAt(),

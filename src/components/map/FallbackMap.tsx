@@ -4,7 +4,7 @@ import { useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { MapPin } from '@/components/map/MapPin';
 import type { MapViewProps } from '@/components/map/types';
 import type { BBox, LatLng } from '@/lib/geo';
-import type { CardData } from '@/lib/restaurants';
+import type { CardData } from '@/lib/cards';
 
 // Pin layer inset inside the canvas (fractions of width/height) so edge pins stay visible.
 const INSET = { top: 0.12, right: 0.1, bottom: 0.24, left: 0.1 };

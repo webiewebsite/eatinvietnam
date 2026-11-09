@@ -6,12 +6,14 @@ import { RestaurantCard } from '@/components/RestaurantCard';
 import { currentDate } from '@/lib/hours';
 import { searchRestaurants, toCard } from '@/lib/restaurants';
 import { MIN_INDEXABLE } from '@/lib/seo';
-import { DISHES, DISTRICTS, getDistrict } from '@/lib/taxonomy';
+import { DISHES, getDistrict } from '@/lib/taxonomy';
 
 export const revalidate = 3600;
 
-export function generateStaticParams() {
-  return DISTRICTS.map((d) => ({ district: d.slug }));
+export function generateStaticParams(): { district: string }[] {
+  // Rendered on the first request, then cached by ISR: never read data during `next build`
+  // (the build may not see DATABASE_URL, and pages built from demo data would be served for an hour).
+  return [];
 }
 
 type Props = { params: Promise<{ district: string }> };
@@ -19,7 +21,7 @@ type Props = { params: Promise<{ district: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const d = getDistrict((await params).district);
   if (!d) return {};
-  const { total } = searchRestaurants({ terms: [], dishes: [], district: d.slug });
+  const { total } = await searchRestaurants({ terms: [], dishes: [], district: d.slug });
   return {
     title: `Quán ngon ${d.label}`,
     description: `${total} quán ăn được chọn lọc ở ${d.label}, Sài Gòn: món nước, cơm, ốc, ăn vặt, cà phê.`,
@@ -31,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DistrictPage({ params }: Props) {
   const d = getDistrict((await params).district);
   if (!d) notFound();
-  const { items, total } = searchRestaurants(
+  const { items, total } = await searchRestaurants(
     { terms: [], dishes: [], district: d.slug, sort: 'rating' },
     { now: currentDate(), limit: 50 },
   );

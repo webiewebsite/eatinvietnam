@@ -18,8 +18,8 @@ function authorized(req: Request): boolean {
  * Daily hPanel cron: restaurants past their re-verification deadline (decision #6).
  * Delivery to editors (email / admin queue) lands with the admin (#8); for now it returns the list.
  */
-export function GET(req: Request) {
+export async function GET(req: Request) {
   if (!authorized(req)) return Response.json({ error: { code: 'unauthorized' } }, { status: 401 });
-  const overdue = overdueForReverification(currentDate());
+  const overdue = await overdueForReverification(currentDate());
   return Response.json({ reverifyDays: REVERIFY_DAYS, count: overdue.length, overdue });
 }

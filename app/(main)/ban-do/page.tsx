@@ -18,6 +18,6 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 export default async function MapPage({ searchParams }: Props) {
   const { q, filters } = readSearchParams(await searchParams);
   const now = currentDate();
-  const { items } = searchRestaurants(filters, { origin: await getViewerLocation(), now, limit: MAX_PINS });
+  const { items } = await searchRestaurants(filters, { origin: await getViewerLocation(), now, limit: MAX_PINS });
   return <MapExplorer cards={items.map((h) => toCard(h, now))} filters={filters} q={q} />;
 }

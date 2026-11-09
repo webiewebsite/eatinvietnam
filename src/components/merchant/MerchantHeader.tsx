@@ -7,7 +7,7 @@ import { DistanceStat } from '@/components/merchant/DistanceStat';
 import { ShareButton } from '@/components/merchant/ShareButton';
 import { Tag } from '@/components/ui/Tag';
 import { formatPriceRange, formatRating } from '@/lib/format';
-import type { RestaurantHit } from '@/lib/restaurants';
+import type { RestaurantHit } from '@/lib/cards';
 import { dishLabel, districtLabel } from '@/lib/taxonomy';
 
 /** Hero 210px + info card overlapping 44px + 4-column stat strip + one-line tip. */

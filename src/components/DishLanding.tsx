@@ -7,7 +7,7 @@ import { TrackedLink } from '@/components/TrackedLink';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Rating } from '@/components/ui/Rating';
 import { formatPriceRange } from '@/lib/format';
-import type { RestaurantHit } from '@/lib/restaurants';
+import type { RestaurantHit } from '@/lib/cards';
 import { faqJsonLd, jsonLdString, breadcrumbJsonLd } from '@/lib/seo';
 import { DISTRICTS, getGroup, type Dish } from '@/lib/taxonomy';
 import { isLateNight } from '@/lib/hours';

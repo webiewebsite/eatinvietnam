@@ -68,38 +68,38 @@ describe('URL state', () => {
 describe('searchRestaurants (demo data)', () => {
   const noon = new Date('2026-11-09T12:00:00+07:00');
 
-  it('finds by keyword without diacritics', () => {
-    const { items } = searchRestaurants(parseQuery('com tam'), { now: noon });
+  it('finds by keyword without diacritics', async () => {
+    const { items } = await searchRestaurants(parseQuery('com tam'), { now: noon });
     expect(items.map((h) => h.restaurant.slug)).toContain('com-tam-suon-moc');
   });
 
-  it('"dưới 50k" means the top of the price range is ≤ 50k', () => {
-    const { items } = searchRestaurants({ terms: [], dishes: [], priceMax: 50000 }, { now: noon, limit: 50 });
+  it('"dưới 50k" means the top of the price range is ≤ 50k', async () => {
+    const { items } = await searchRestaurants({ terms: [], dishes: [], priceMax: 50000 }, { now: noon, limit: 50 });
     const slugs = items.map((h) => h.restaurant.slug);
     expect(slugs).toContain('banh-mi-co-tu'); // 20–35k
     expect(slugs).not.toContain('bun-bo-hue-o-xuan'); // 45–65k
   });
 
-  it('excludes unknown prices from price filters', () => {
-    const { items } = searchRestaurants({ terms: [], dishes: [], priceMax: 1_000_000 }, { now: noon, limit: 50 });
+  it('excludes unknown prices from price filters', async () => {
+    const { items } = await searchRestaurants({ terms: [], dishes: [], priceMax: 1_000_000 }, { now: noon, limit: 50 });
     expect(items.map((h) => h.restaurant.slug)).not.toContain('che-co-sau');
   });
 
-  it('late-night filter keeps overnight places', () => {
-    const { items } = searchRestaurants({ terms: [], dishes: [], lateNight: true }, { now: noon, limit: 50 });
+  it('late-night filter keeps overnight places', async () => {
+    const { items } = await searchRestaurants({ terms: [], dishes: [], lateNight: true }, { now: noon, limit: 50 });
     expect(items.map((h) => h.restaurant.slug)).toContain('chao-ech-dem-sai-gon');
     expect(items.map((h) => h.restaurant.slug)).not.toContain('ca-phe-phin-goc-pho');
   });
 
-  it('sorts by distance when the viewer location is known', () => {
+  it('sorts by distance when the viewer location is known', async () => {
     const origin = { lat: 10.7725, lng: 106.698 };
-    const { items } = searchRestaurants({ terms: [], dishes: [] }, { origin, now: noon, limit: 50 });
+    const { items } = await searchRestaurants({ terms: [], dishes: [] }, { origin, now: noon, limit: 50 });
     const d = items.map((h) => h.distance ?? 0);
     expect([...d].sort((a, b) => a - b)).toEqual(d);
   });
 
-  it('sorts editor picks first when the location is unknown', () => {
-    const { items } = searchRestaurants({ terms: [], dishes: [] }, { now: noon, limit: 50 });
+  it('sorts editor picks first when the location is unknown', async () => {
+    const { items } = await searchRestaurants({ terms: [], dishes: [] }, { now: noon, limit: 50 });
     const firstNonPick = items.findIndex((h) => !h.restaurant.editorPick);
     expect(items.slice(firstNonPick).some((h) => h.restaurant.editorPick)).toBe(false);
   });

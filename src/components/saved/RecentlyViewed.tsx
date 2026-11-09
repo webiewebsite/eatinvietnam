@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { RestaurantPhoto } from '@/components/RestaurantPhoto';
-import type { CardData } from '@/lib/restaurants';
+import type { CardData } from '@/lib/cards';
 import { useSavedStore } from '@/lib/saved';
 
 export function RecentlyViewed() {
