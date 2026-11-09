@@ -35,7 +35,7 @@ export default function MePage() {
         >
           Đọc chính sách bảo mật <ChevronRight aria-hidden className="size-4" />
         </Link>
-        <CookieSettingsButton className="mt-2 ml-2 inline-flex h-11 items-center rounded-full px-3 text-[14px] font-semibold text-thanhlong underline" />
+        <CookieSettingsButton className="mt-1 flex h-11 items-center text-[14px] font-semibold text-thanhlong underline" />
       </section>
 
       <section aria-labelledby="feedback">

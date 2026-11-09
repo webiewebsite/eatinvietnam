@@ -43,7 +43,9 @@ for (const vp of VIEWPORTS) {
   // Seed saved restaurants so /da-luu is not empty.
   await context.addInitScript(() => {
     try {
-      if (!location.search.includes('_shot=cookie')) localStorage.setItem('eiv:consent', 'denied');
+      // localStorage is shared by every page of the context, so clear it explicitly for the banner shot.
+      if (location.search.includes('_shot=cookie')) localStorage.removeItem('eiv:consent');
+      else localStorage.setItem('eiv:consent', 'denied');
       localStorage.setItem(
         'eiv:saved',
         JSON.stringify([
