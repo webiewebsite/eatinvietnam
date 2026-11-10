@@ -1,6 +1,7 @@
 'use client';
 
 import { missingForPublish, type RestaurantInputT } from '@/lib/admin/schemas';
+import { OsmSuggest } from './OsmSuggest';
 import { PhotoManager, type ManagedPhoto } from './PhotoManager';
 import { RestaurantForm, type AreaOption } from './RestaurantForm';
 import { StatusPanel } from './StatusPanel';
@@ -62,7 +63,7 @@ export function RestaurantEditor({
   );
 }
 
-/** New restaurant: an empty draft (OSM suggestions are added on top in #30). */
+/** New restaurant: an empty draft, optionally prefilled from an OpenStreetMap suggestion (#30). */
 export function RestaurantCreator({ districts, wards, defaultDistrict }: { districts: AreaOption[]; wards: string[]; defaultDistrict: string }) {
   return (
     <RestaurantForm
@@ -73,6 +74,7 @@ export function RestaurantCreator({ districts, wards, defaultDistrict }: { distr
       photos={[]}
       locked={false}
       slug={null}
+      prefillSlot={(apply) => <OsmSuggest apply={apply} />}
       aside={() => (
         <p className="rounded-card border border-line bg-surface p-4 text-[14px] text-muted">
           Quán mới được lưu ở trạng thái <b>nháp</b> (chưa hiện trên web). Sau khi lưu bạn thêm ảnh, rồi xác minh để đăng.
