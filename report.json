@@ -1,0 +1,114 @@
+[
+  {
+    "name": "a1-dang-nhap",
+    "width": 390,
+    "status": 200,
+    "url": "http://localhost:3100/admin/dang-nhap",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a2-danh-sach",
+    "width": 390,
+    "status": 200,
+    "url": "http://localhost:3100/admin",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a3-sua-quan",
+    "width": 390,
+    "status": 200,
+    "url": "http://localhost:3100/admin/quan/1",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a4-them-quan",
+    "width": 390,
+    "status": 200,
+    "url": "http://localhost:3100/admin/quan/moi",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a5-sap-qua-han",
+    "width": 390,
+    "status": 200,
+    "url": "http://localhost:3100/admin/sap-qua-han",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a6-nguoi-dung",
+    "width": 390,
+    "status": 200,
+    "url": "http://localhost:3100/admin/nguoi-dung",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a7-tai-khoan",
+    "width": 390,
+    "status": 200,
+    "url": "http://localhost:3100/admin/tai-khoan",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a1-dang-nhap",
+    "width": 1280,
+    "status": 200,
+    "url": "http://localhost:3100/admin/dang-nhap",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a2-danh-sach",
+    "width": 1280,
+    "status": 200,
+    "url": "http://localhost:3100/admin",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a3-sua-quan",
+    "width": 1280,
+    "status": 200,
+    "url": "http://localhost:3100/admin/quan/1",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a4-them-quan",
+    "width": 1280,
+    "status": 200,
+    "url": "http://localhost:3100/admin/quan/moi",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a5-sap-qua-han",
+    "width": 1280,
+    "status": 200,
+    "url": "http://localhost:3100/admin/sap-qua-han",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a6-nguoi-dung",
+    "width": 1280,
+    "status": 200,
+    "url": "http://localhost:3100/admin/nguoi-dung",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "name": "a7-tai-khoan",
+    "width": 1280,
+    "status": 200,
+    "url": "http://localhost:3100/admin/tai-khoan",
+    "overflow": 0,
+    "errors": []
+  }
+]
