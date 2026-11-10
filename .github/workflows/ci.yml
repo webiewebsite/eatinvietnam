@@ -245,7 +245,7 @@ jobs:
       # Issue #8 acceptance criteria + security rules, against the real server, DB and (fake) R2.
       - name: Admin end-to-end (#8)
         if: matrix.engine == 'mariadb:11.8'
-        run: BASE_URL=http://localhost:3100 node scripts/admin-e2e.mjs || { tail -n 80 server.log; exit 1; }
+        run: BASE_URL=http://localhost:3100 node scripts/admin-e2e.mjs || { tail -n 80 server.log; tail -n 40 s3.log; exit 1; }
       - name: Admin screenshots (390px / 1280px)
         if: matrix.engine == 'mariadb:11.8'
         run: |

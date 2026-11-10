@@ -217,6 +217,7 @@ async function main() {
   // Delete photo → objects gone
   const del = await admin(`/api/admin/photos/${uploaded.body.id}`, { method: 'DELETE', json: {} });
   const gone = await Promise.all([480, 960, 1440].map((w) => fetch(`${S3}/${photo.k.replace('-1440.', `-${w}.`)}`, { method: 'HEAD' })));
+  if (del.status !== 200 || !gone.every((r) => r.status === 404)) console.error('    delete:', del.status, JSON.stringify(del.body), gone.map((r) => r.status));
   expect(del.status === 200 && gone.every((r) => r.status === 404), 'deleting a photo removes every R2 size');
 
   // ── editors, scope, disable ───────────────────────────────────────────────

@@ -34,6 +34,7 @@ createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://x');
     const path = decodeURIComponent(url.pathname.slice(1));
+    console.warn(`${req.method} ${req.url} ${req.headers['content-encoding'] ?? ''}`);
     if (req.method === 'PUT') {
       let body = await read(req);
       if ((req.headers['content-encoding'] ?? '').includes('aws-chunked')) body = unchunk(body);
@@ -42,7 +43,10 @@ createServer(async (req, res) => {
       return;
     }
     if (req.method === 'POST' && url.searchParams.has('delete')) {
-      const xml = (await read(req)).toString();
+      let raw = await read(req);
+      if ((req.headers['content-encoding'] ?? '').includes('aws-chunked')) raw = unchunk(raw);
+      const xml = raw.toString();
+      console.warn(`  delete body: ${xml.slice(0, 300)}`);
       for (const m of xml.matchAll(/<Key>([^<]+)<\/Key>/g)) objects.delete(`${path}/${m[1]}`);
       res.writeHead(200, { 'content-type': 'application/xml' }).end('<?xml version="1.0" encoding="UTF-8"?><DeleteResult></DeleteResult>');
       return;
