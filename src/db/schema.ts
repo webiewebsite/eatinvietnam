@@ -104,6 +104,27 @@ export const sessions = mysqlTable(
   (t) => [index('sessions_user_idx').on(t.userId), index('sessions_expires_idx').on(t.expiresAt)],
 );
 
+/**
+ * One-time links for admin accounts (#8): `invite` (new account sets its password) and
+ * `reset` (admin-issued password reset). Only the SHA-256 of the token is stored.
+ */
+export const userTokens = mysqlTable(
+  'user_tokens',
+  {
+    id: id(),
+    userId: ref('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    purpose: mysqlEnum('purpose', ['invite', 'reset']).notNull(),
+    tokenHash: char('token_hash', { length: 64 }).notNull(),
+    expiresAt: datetime('expires_at').notNull(),
+    usedAt: datetime('used_at'),
+    createdBy: ref('created_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex('user_tokens_hash_uq').on(t.tokenHash), index('user_tokens_user_idx').on(t.userId)],
+);
+
 export const ownerClaims = mysqlTable(
   'owner_claims',
   {
@@ -268,6 +289,8 @@ export const restaurantTags = mysqlTable(
       .references(() => tags.id, { onDelete: 'cascade' }),
     /** The restaurant's main dish (breadcrumb, map pin label). */
     isPrimary: boolean('is_primary').notNull().default(false),
+    /** Vibe tags: which editorial criteria the editor ticked (content/vibes.json version + booleans). */
+    criteria: json('criteria').$type<{ version: string; checked: boolean[] }>(),
   },
   (t) => [primaryKey({ columns: [t.restaurantId, t.tagId] }), index('restaurant_tags_tag_idx').on(t.tagId)],
 );

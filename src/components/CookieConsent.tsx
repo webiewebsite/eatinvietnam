@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useSyncExternalStore } from 'react';
 import { CONSENT_EVENT, analyticsEnabled, readConsent, writeConsent } from '@/lib/consent';
 import { disableGa, loadGa } from '@/lib/ga';
@@ -23,15 +24,17 @@ const serverSnapshot = () => 'ssr' as const;
 
 export function CookieConsent() {
   const consent = useSyncExternalStore(subscribe, snapshot, serverSnapshot);
+  // Staff work in /admin is not analytics: no banner, no GA there.
+  const isAdmin = usePathname()?.startsWith('/admin') ?? false;
 
   useEffect(() => {
-    if (!analyticsEnabled()) return;
+    if (!analyticsEnabled() || isAdmin) return;
     if (consent === 'granted') loadGa();
     if (consent === 'denied') disableGa();
-  }, [consent]);
+  }, [consent, isAdmin]);
 
   // NEXT_PUBLIC_GA_ID is inlined at build time, so this is the same on server and client.
-  if (!analyticsEnabled() || consent !== 'none') return null;
+  if (!analyticsEnabled() || isAdmin || consent !== 'none') return null;
 
   return (
     <section

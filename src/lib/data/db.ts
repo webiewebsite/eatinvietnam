@@ -10,6 +10,7 @@ import { getDb } from '@/db/client';
 import { distanceTo, latOf, lngOf, withinBox } from '@/db/point';
 import { areas, menuItems, openingHours, photos, restaurantAreas, restaurantTags, restaurants, tags } from '@/db/schema';
 import { bboxAround } from '@/lib/geo';
+import { photoUrl } from '@/lib/photo-url';
 import { LATE_NIGHT_AFTER, saigonClock, toMinutes } from '@/lib/hours';
 import type { MenuItem, OpeningSlot, Photo, Restaurant } from '@/lib/types';
 import type { RestaurantSource, SearchQuery } from './source';
@@ -131,8 +132,8 @@ type PhotoRow = {
 };
 
 function toPhoto(p: PhotoRow): Photo | null {
-  // R2 keys go through the next/image loader (lib/image-loader.ts); demo photos are full URLs.
-  const src = p.r2Key ?? p.externalUrl;
+  // R2 objects → public URL (lib/photo-url.ts); demo photos are already full URLs.
+  const src = photoUrl(p);
   if (!src) return null;
   return {
     src,
