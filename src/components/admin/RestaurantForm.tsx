@@ -173,8 +173,8 @@ export function RestaurantForm({
   const outside = coords && !inHcmc(coords);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_320px] lg:items-start">
-      <div className="flex flex-col gap-4">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+      <div className="flex min-w-0 flex-col gap-4">
         {prefillSlot?.((p) => setD((x) => ({ ...x, ...Object.fromEntries(Object.entries(p).filter(([, v]) => v != null && v !== '')) })))}
 
         <Card title="Thông tin" id="thong-tin">
@@ -473,7 +473,7 @@ export function RestaurantForm({
         </Card>
       </div>
 
-      <div className="flex flex-col gap-4 lg:sticky lg:top-28">
+      <div className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-28">
         {/* Mobile: pinned to the bottom of the screen; desktop: top of the side column. */}
         <div className="fixed inset-x-3 bottom-3 z-30 flex flex-col gap-2 rounded-card border border-line bg-surface p-3 shadow-card lg:static lg:inset-auto lg:z-auto">
           {error && <Notice tone="error">{error}</Notice>}

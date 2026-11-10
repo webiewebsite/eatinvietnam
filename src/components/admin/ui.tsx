@@ -58,9 +58,9 @@ export function Button({
 
 export function Card({ title, actions, children, className, id }: { title?: string; actions?: React.ReactNode; children: React.ReactNode; className?: string; id?: string }) {
   return (
-    <section id={id} className={clsx('scroll-mt-20 rounded-card border border-line bg-surface p-4', className)}>
+    <section id={id} className={clsx('min-w-0 scroll-mt-20 rounded-card border border-line bg-surface p-4', className)}>
       {(title || actions) && (
-        <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           {title && <h2 className="text-section font-bold">{title}</h2>}
           {actions}
         </div>

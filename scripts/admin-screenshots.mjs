@@ -44,7 +44,12 @@ for (const vp of VIEWPORTS) {
     page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
     page.on('pageerror', (e) => errors.push(e.message));
     const res = await page.goto(BASE + path, { waitUntil: 'networkidle' });
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    // Page-level scroll AND cards poking past the right edge (clipped overflow does not scroll).
+    const overflow = await page.evaluate(() => {
+      const page = document.documentElement.scrollWidth - window.innerWidth;
+      const cards = [...document.querySelectorAll('main section, main form, main > div > ul')].map((e) => e.getBoundingClientRect().right - window.innerWidth);
+      return Math.max(page, ...cards, 0);
+    });
     // Pexels demo photos are hot-linked; offline runners may fail them — not an app error.
     const appErrors = errors.filter((e) => !/images\.pexels\.com|net::ERR_/i.test(e));
     report.push({ name, width: vp.w, status: res?.status(), url: page.url(), overflow, errors: appErrors });
