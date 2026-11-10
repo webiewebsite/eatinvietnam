@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { clsx } from 'clsx';
-import { FoodIcon } from '@/components/icons/food/FoodIcon';
+import { DishBadge } from '@/components/icons/food/FoodIcon';
 import { WaitlistForm } from '@/components/home/WaitlistForm';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Tag } from '@/components/ui/Tag';
@@ -96,9 +96,7 @@ export function CityMode({ cities, route, regional }: { cities: City[]; route: S
             return (
               <li key={slug}>
                 <Link href={`/mon/${slug}`} className="flex items-center gap-2.5 rounded-card bg-surface p-2.5 shadow-card">
-                  <span className="grid size-11 shrink-0 place-items-center rounded-full bg-thanhlong-soft">
-                    <FoodIcon slug={slug} size={28} />
-                  </span>
+                  <DishBadge slug={slug} size={44} />
                   <span className="min-w-0">
                     <span className="block truncate text-[14px] font-bold">{d.label}</span>
                     <span className="block truncate text-[12px] text-muted">{d.origin}</span>
