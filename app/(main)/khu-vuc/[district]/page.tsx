@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { FoodIcon } from '@/components/icons/food/FoodIcon';
+import { DishBadge } from '@/components/icons/food/FoodIcon';
 import { RestaurantCard } from '@/components/RestaurantCard';
 import { currentDate } from '@/lib/hours';
 import { searchRestaurants, toCard } from '@/lib/restaurants';
@@ -53,7 +53,7 @@ export default async function DistrictPage({ params }: Props) {
               href={`/khu-vuc/${d.slug}/${dish.slug}`}
               className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface pr-3.5 pl-1.5 text-[14px] font-semibold"
             >
-              <FoodIcon slug={dish.slug} size={26} />
+              <DishBadge slug={dish.slug} size={28} />
               {dish.label}
             </Link>
           </li>

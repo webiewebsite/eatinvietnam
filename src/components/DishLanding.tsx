@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ChevronDown, Map as MapIcon } from 'lucide-react';
 import { clsx } from 'clsx';
-import { FoodIcon } from '@/components/icons/food/FoodIcon';
+import { DishBadge } from '@/components/icons/food/FoodIcon';
 import { RestaurantPhoto } from '@/components/RestaurantPhoto';
 import { TrackedLink } from '@/components/TrackedLink';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -72,9 +72,7 @@ export function DishLanding({ dish, district, hits }: { dish: Dish; district?: s
               {hits.length} quán được chọn{typical && ` · giá phổ biến ${typical}`}
             </p>
           </div>
-          <span className="grid size-16 shrink-0 place-items-center rounded-full bg-surface shadow-card">
-            <FoodIcon slug={dish.slug} size={40} />
-          </span>
+          <DishBadge slug={dish.slug} size={64} className="shadow-card" />
         </div>
         <p className="mt-3 text-[15px] leading-relaxed">{copy.intro}</p>
       </header>

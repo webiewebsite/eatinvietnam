@@ -81,6 +81,8 @@ jobs:
           npm start -- -p 3000 &
           npx --yes wait-on@8 http://localhost:3000/api/health --timeout 60000
           npm run screenshots
+          # Contact sheet of the 14 dish icons for design review (ops doc item 9).
+          node --experimental-strip-types --no-warnings scripts/dish-icons-preview.mts screenshots/12-dish-icons.png
       - uses: actions/upload-artifact@v4
         if: always()
         with:

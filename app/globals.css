@@ -53,6 +53,19 @@
   color-scheme: dark;
 }
 
+/* Dish icon badges: colours come per dish from content/taxonomy.json as --dish-*-l/-d
+   (FoodIcon dishToneStyle); unknown dishes fall back to the brand tint. */
+.dish-tone {
+  --dish-bg: var(--dish-bg-l, var(--thanhlong-soft));
+  --dish-fg: var(--dish-fg-l, var(--thanhlong));
+  background-color: var(--dish-bg);
+  color: var(--dish-fg);
+}
+[data-theme='dark'] .dish-tone {
+  --dish-bg: var(--dish-bg-d, var(--thanhlong-soft));
+  --dish-fg: var(--dish-fg-d, var(--thanhlong));
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);

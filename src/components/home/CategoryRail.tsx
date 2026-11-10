@@ -1,9 +1,9 @@
-import { FoodIcon } from '@/components/icons/food/FoodIcon';
+import { DishBadge } from '@/components/icons/food/FoodIcon';
 import { TrackedLink } from '@/components/TrackedLink';
 import { RailIndicator } from '@/components/home/RailIndicator';
 import { DISHES } from '@/lib/taxonomy';
 
-/** 2-row horizontally scrolling dish rail (70px columns, 52px round sticker icons). ~10 visible at 360px. */
+/** 2-row horizontally scrolling dish rail (70px columns, 52px round dish-colour badges). ~10 visible at 360px. */
 export function CategoryRail() {
   const railId = 'category-rail';
   return (
@@ -20,9 +20,7 @@ export function CategoryRail() {
               props={{ dish: d.slug }}
               className="flex flex-col items-center gap-1 text-center"
             >
-              <span className="grid size-13 place-items-center rounded-full border border-line bg-thanhlong-soft">
-                <FoodIcon slug={d.slug} size={34} />
-              </span>
+              <DishBadge slug={d.slug} size={52} />
               <span className="line-clamp-2 text-[12px] leading-tight font-medium">{d.label}</span>
             </TrackedLink>
           </li>
