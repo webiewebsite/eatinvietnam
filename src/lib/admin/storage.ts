@@ -18,8 +18,12 @@ function client(): S3Client {
     region: 'auto',
     endpoint: e.R2_ENDPOINT || `https://${e.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
     credentials: { accessKeyId: e.R2_ACCESS_KEY_ID!, secretAccessKey: e.R2_SECRET_ACCESS_KEY! },
-    // MinIO needs path-style; R2 accepts both.
+    // Test servers need path-style; R2 accepts both.
     forcePathStyle: !!e.R2_ENDPOINT,
+    // Only send checksums the API requires: aws-sdk-js-v3 ≥ 3.729 adds new default checksums
+    // that S3-compatible services have not always accepted.
+    requestChecksumCalculation: 'WHEN_REQUIRED',
+    responseChecksumValidation: 'WHEN_REQUIRED',
   });
   return g.__eivS3;
 }

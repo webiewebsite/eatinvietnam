@@ -122,6 +122,17 @@ jobs:
           --health-interval=5s --health-timeout=5s --health-retries=30
     env:
       DATABASE_URL: mysql://root:root@127.0.0.1:3306/eatinvietnam_ci
+      # Admin (#8): bootstrap + 2FA required + fake S3 standing in for R2 (scripts/fake-s3.mjs).
+      ADMIN_BOOTSTRAP_EMAILS: admin@ci.test
+      ADMIN_SETUP_CODE: ci-setup-code-2026
+      ADMIN_SECRET_KEY: ci-only-secret-key-0123456789abcdef
+      REQUIRE_ADMIN_2FA: '1'
+      CRON_SECRET: ci-cron-secret
+      R2_ENDPOINT: http://127.0.0.1:9000
+      R2_BUCKET: eiv-ci
+      R2_ACCESS_KEY_ID: ci
+      R2_SECRET_ACCESS_KEY: ci
+      R2_PUBLIC_URL: http://127.0.0.1:9000/eiv-ci
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -174,6 +185,7 @@ jobs:
         run: |
           # The build must not read restaurants (ISR renders on first request): a dead DB proves it.
           DATABASE_URL=mysql://root:root@127.0.0.1:3999/unreachable npm run build
+          node scripts/fake-s3.mjs 9000 > s3.log 2>&1 &
           npm start -- -p 3100 > server.log 2>&1 &
           npx --yes wait-on@8 http://localhost:3100/api/health --timeout 90000
           sleep 2
@@ -230,6 +242,30 @@ jobs:
             const [r]=await c.query('SELECT unsubscribed_at u FROM newsletter_subscribers');
             if(!r[0].u)throw new Error('not unsubscribed');await c.end();})().catch(e=>{console.error(e);process.exit(1)})"
           grep -q 'SMTP_\* not set' server.log
+      # Issue #8 acceptance criteria + security rules, against the real server, DB and (fake) R2.
+      - name: Admin end-to-end (#8)
+        if: matrix.engine == 'mariadb:11.8'
+        run: BASE_URL=http://localhost:3100 node scripts/admin-e2e.mjs || { tail -n 80 server.log; exit 1; }
+      - name: Admin screenshots (390px / 1280px)
+        if: matrix.engine == 'mariadb:11.8'
+        run: |
+          npx playwright install --with-deps chromium
+          BASE_URL=http://localhost:3100 node scripts/admin-screenshots.mjs
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.engine == 'mariadb:11.8'
+        with:
+          name: admin-screenshots
+          path: admin-screenshots/
+          retention-days: 7
+      - name: Publish admin screenshots branch
+        if: always() && matrix.engine == 'mariadb:11.8' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          [ -d admin-screenshots ] || exit 0
+          cd admin-screenshots
+          git init -q -b shots
+          git add -A
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "admin screenshots for ${{ github.event.pull_request.head.sha }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" shots:refs/heads/ci/admin-screenshots-pr-${{ github.event.number }}
       - name: Publish generated migrations + lockfile
         if: always() && steps.gen.outputs.changed == 'true' && matrix.engine == 'mariadb:11.8' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: |
