@@ -183,3 +183,56 @@ describe('menu paste (spreadsheet template)', () => {
     ]);
   });
 });
+
+describe('OSM suggestions (#30)', () => {
+  const item = (over: Record<string, unknown> = {}) => ({
+    osm_type: 'node',
+    osm_id: 123,
+    lat: '10.7798123',
+    lon: '106.6889456',
+    category: 'amenity',
+    type: 'restaurant',
+    name: 'Bún bò Gánh',
+    display_name: 'Bún bò Gánh, 110 Lý Chính Thắng, Phường Xuân Hòa, Thành phố Hồ Chí Minh',
+    address: { house_number: '110', road: 'Lý Chính Thắng', quarter: 'Phường Xuân Hòa', city: 'Thành phố Hồ Chí Minh' },
+    extratags: { opening_hours: 'Mo-Su 06:00-21:00', 'contact:phone': '+84 28 0000 0000', cuisine: 'vietnamese' },
+    ...over,
+  });
+
+  it('maps Nominatim results, food places first, ignores broken rows', async () => {
+    const { parseNominatim } = await import('@/lib/admin/osm');
+    const out = parseNominatim([item({ type: 'house', name: 'Nhà 12', osm_id: 1 }), item(), { lat: 'x', lon: '1' }]);
+    expect(out).toHaveLength(2);
+    expect(out[0]).toEqual({
+      name: 'Bún bò Gánh',
+      address: '110 Lý Chính Thắng, Phường Xuân Hòa, Thành phố Hồ Chí Minh',
+      lat: 10.779812,
+      lng: 106.688946,
+      kind: 'restaurant',
+      cuisine: 'vietnamese',
+      openingHours: 'Mo-Su 06:00-21:00',
+      phone: '+84 28 0000 0000',
+      osmUrl: 'https://www.openstreetmap.org/node/123',
+    });
+    expect(parseNominatim({ error: 'x' })).toEqual([]);
+  });
+
+  it('identifies itself, waits ≥ 1.1 s between requests and caches', async () => {
+    const { resetOsmState, searchOsm } = await import('@/lib/admin/osm');
+    resetOsmState();
+    let clock = 1_000_000;
+    const calls: { at: number; ua: string | null; url: string }[] = [];
+    const fakeFetch = (async (url: URL, init?: RequestInit) => {
+      calls.push({ at: clock, ua: new Headers(init?.headers).get('user-agent'), url: String(url) });
+      return new Response(JSON.stringify([item()]), { status: 200 });
+    }) as unknown as typeof fetch;
+    const deps = { fetch: fakeFetch, now: () => clock, sleep: async (ms: number) => void (clock += ms) };
+    await Promise.all([searchOsm('bún bò', deps), searchOsm('phở', deps)]);
+    await searchOsm('  Bún   Bò ', deps); // cached (normalised)
+    expect(calls).toHaveLength(2);
+    expect(calls[1]!.at - calls[0]!.at).toBeGreaterThanOrEqual(1100);
+    expect(calls[0]!.ua).toMatch(/^EatInVietnam-admin\//);
+    expect(calls[0]!.url).toContain('countrycodes=vn');
+    expect(calls[0]!.url).toContain('bounded=1');
+  });
+});
