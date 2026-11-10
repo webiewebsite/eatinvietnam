@@ -47,7 +47,8 @@ createServer(async (req, res) => {
       if ((req.headers['content-encoding'] ?? '').includes('aws-chunked')) raw = unchunk(raw);
       const xml = raw.toString();
       console.warn(`  delete body: ${xml.slice(0, 300)}`);
-      for (const m of xml.matchAll(/<Key>([^<]+)<\/Key>/g)) objects.delete(`${path}/${m[1]}`);
+      const bucket = path.replace(/\/+$/, ''); // "/bucket/?delete" and "/bucket?delete" both occur
+      for (const m of xml.matchAll(/<Key>([^<]+)<\/Key>/g)) objects.delete(`${bucket}/${m[1]}`);
       res.writeHead(200, { 'content-type': 'application/xml' }).end('<?xml version="1.0" encoding="UTF-8"?><DeleteResult></DeleteResult>');
       return;
     }
