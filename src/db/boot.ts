@@ -10,6 +10,7 @@
 import path from 'node:path';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
 import { getDb } from './client';
+import { ensureReferenceData } from './reference';
 import { backfillDemo, seedDemo } from './seed';
 
 export const MIGRATIONS_FOLDER = path.join(process.cwd(), 'src', 'db', 'migrations');
@@ -53,6 +54,13 @@ async function run(env: NodeJS.ProcessEnv): Promise<BootReport> {
       console.error('[db] migration failed — fix and redeploy (or set DATA_SOURCE=demo meanwhile)', e);
       return report; // never seed on top of a half-migrated schema
     }
+  }
+
+  // Roles, districts, dish/vibe tags: needed by the admin on every database (idempotent).
+  try {
+    await ensureReferenceData(db);
+  } catch (e) {
+    console.error('[db] reference data failed', errorCode(e));
   }
 
   if (env.SEED_DEMO_IF_EMPTY === '1') {

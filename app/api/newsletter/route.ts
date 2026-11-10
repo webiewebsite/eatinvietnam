@@ -4,7 +4,8 @@ import { after } from 'next/server';
 import { getDb, hasDatabase } from '@/db/client';
 import { newsletterSubscribers } from '@/db/schema';
 import { sendMail } from '@/lib/mail';
-import { CONSENT_TEXT, SignupSchema, createRateLimiter, normalizeEmail } from '@/lib/newsletter';
+import { CONSENT_TEXT, SignupSchema, normalizeEmail } from '@/lib/newsletter';
+import { clientKey, createRateLimiter } from '@/lib/rate-limit';
 import { siteUrl } from '@/lib/seo';
 import home from '@content/home.json';
 
@@ -12,9 +13,6 @@ const CITY_LABEL = new Map(home.cities.map((c) => [c.slug, c.label]));
 
 // 5 sign-ups per 10 minutes per client address; the address itself is never stored.
 const allow = createRateLimiter(5, 10 * 60 * 1000);
-
-const clientKey = (req: Request) =>
-  req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown';
 
 /**
  * City waitlist / newsletter sign-up. Always answers 204 for a valid request, whether the

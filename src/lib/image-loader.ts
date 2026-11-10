@@ -3,6 +3,8 @@ import type { ImageLoaderProps } from 'next/image';
 // Widths we pre-resize to when uploading to R2 (see issue #8).
 export const R2_WIDTHS = [480, 960, 1440] as const;
 
+const R2_KEY_SUFFIX = /^https?:\/\/[^/]+\/(?:.+\/)?restaurants\/\d+\/[A-Za-z0-9-]+-\d+\.webp$/;
+
 export function roundUpWidth(width: number): number {
   return R2_WIDTHS.find((w) => w >= width) ?? R2_WIDTHS[R2_WIDTHS.length - 1]!;
 }
@@ -22,6 +24,8 @@ export default function imageLoader({ src, width, quality }: ImageLoaderProps): 
     url.searchParams.set('q', String(quality ?? 70));
     return url.toString();
   }
+  // R2 photo by full public URL (resolved on the server, lib/photo-url.ts).
+  if (R2_KEY_SUFFIX.test(src)) return src.replace(/-\d+\.webp$/, `-${roundUpWidth(width)}.webp`);
   if (src.startsWith('restaurants/')) {
     const base = process.env.NEXT_PUBLIC_R2_PUBLIC_URL ?? '';
     return `${base}/${src.replace(/-\d+\.webp$/, `-${roundUpWidth(width)}.webp`)}`;

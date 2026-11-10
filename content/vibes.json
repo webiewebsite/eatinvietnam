@@ -1,0 +1,42 @@
+{
+  "$comment": "Editorial vibe tags (ops doc, 'Tiêu chí gắn 4 tag biên tập', proposed 09/11). A restaurant gets a tag only when ALL its criteria are ticked in the admin. Bump `version` whenever a criterion changes: stored ticks record the version they were made against.",
+  "version": "2026-11-09",
+  "vibes": [
+    {
+      "slug": "hen-ho",
+      "label": "Hẹn hò",
+      "criteria": [
+        "Có bàn 2 người, nói chuyện bình thường vẫn nghe rõ",
+        "Không gian sạch, có trang trí, ánh sáng dịu",
+        "Mở tới ít nhất 21:00"
+      ]
+    },
+    {
+      "slug": "ca-phe-lam-viec",
+      "label": "Cà phê làm việc",
+      "criteria": [
+        "Wifi đo tại chỗ đạt từ 10 Mbps",
+        "Ổ cắm dùng được ở ít nhất 1/3 số bàn",
+        "Bàn đặt vừa laptop, ngồi 2 giờ không bị nhắc"
+      ]
+    },
+    {
+      "slug": "di-nhom-ban",
+      "label": "Đi nhóm bạn",
+      "criteria": [
+        "Ngồi được nhóm từ 6 người không cần đặt trước (giờ thường)",
+        "Có món ăn chung (lẩu, nướng, đĩa lớn, món nhậu)",
+        "Không gian ồn được, không bị nhắc giữ yên lặng"
+      ]
+    },
+    {
+      "slug": "healthy",
+      "label": "Healthy",
+      "criteria": [
+        "Ít nhất 3 món nhiều rau, ít dầu mỡ, hoặc món chay ghi rõ",
+        "Cho chọn ít đường, ít dầu, đổi thành phần khi gọi",
+        "Có đồ uống không đường (nước lọc, trà, nước ép không thêm đường)"
+      ]
+    }
+  ]
+}

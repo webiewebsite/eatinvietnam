@@ -7,23 +7,15 @@ import { DEMO_RESTAURANTS } from '@/data/demo-restaurants';
 import { toHit, type RestaurantHit } from '@/lib/cards';
 import { inBBox } from '@/lib/geo';
 import { isLateNight, openState } from '@/lib/hours';
-import { matchesAllTerms, toStoredSearchText } from '@/lib/search/normalize';
-import { dishLabel, districtLabel, getDish } from '@/lib/taxonomy';
+import { matchesAllTerms } from '@/lib/search/normalize';
+import { searchTextFor } from '@/lib/search/search-text';
+import { getDish } from '@/lib/taxonomy';
 import type { Restaurant } from '@/lib/types';
 import { isVerificationOverdue } from '@/lib/verification';
 import type { RestaurantSource, SearchQuery } from './source';
 
 /** Same text the seed writes into restaurants.search_text. */
-export const demoSearchText = (r: Restaurant) =>
-  toStoredSearchText(
-    r.name,
-    r.dishes.map(dishLabel).join(' '),
-    districtLabel(r.district),
-    r.venueType,
-    r.highlight,
-    r.features.join(' '),
-    r.menu.map((m) => m.name).join(' '),
-  );
+export const demoSearchText = (r: Restaurant) => searchTextFor(r);
 
 const PUBLIC = DEMO_RESTAURANTS.filter((r) => r.status === 'verified');
 const SEARCH_TEXT = new Map(PUBLIC.map((r) => [r.slug, demoSearchText(r)]));

@@ -58,6 +58,33 @@ filters × locations × times. Data pages are never built at `next build` time: 
 first request and ISR caches them for an hour (admin saves will call `revalidatePath`, #8).
 Client components import card shapes from `src/lib/cards.ts`, never from `lib/restaurants`.
 
+### Admin (`/admin`, #8)
+
+One account per person (decision #7): roles **editor** (only restaurants in their areas) and
+**admin** (everything + user management). Every change is written to `audit_log` and shown on the
+restaurant's edit page. Code: `src/lib/admin/`, `app/admin/`, `app/api/admin/`.
+
+- **First admins.** Set `ADMIN_BOOTSTRAP_EMAILS` (comma-separated) and `ADMIN_SETUP_CODE`
+  (≥ 12 chars, given in person) in hPanel. Each listed email registers once at `/admin/thiet-lap`.
+  Everyone else is invited from **Người dùng**: the admin gets a one-time link (also emailed when
+  SMTP is set). Lost password → the admin creates a reset link there.
+- **2FA (TOTP).** Required unless `REQUIRE_ADMIN_2FA=0` (staging). Needs `ADMIN_SECRET_KEY`
+  (≥ 32 chars, encrypts the secrets; changing it means everyone re-enrols).
+- **Security.** Sessions are server-side (`sessions`, 12 h, cookie holds a random token, DB its
+  SHA-256). Mutating `/api/admin` calls need the header `x-eiv-admin: 1` (CSRF). Login is
+  rate-limited per email and per client; disabling an account ends its sessions immediately.
+- **Restaurants.** New ones start as draft. "Xác minh & đăng" records the method, the person and
+  the 90-day deadline; only `verified` is public. Saves revalidate the public pages (ISR).
+  The slug freezes after the first verification.
+- **Photos.** Upload → `sharp` decodes (no trust in Content-Type), rotates, strips all metadata
+  (EXIF/GPS), writes WebP 480/960/1440 to R2 under `restaurants/<id>/<uuid>-<w>.webp`. Deleting a
+  photo deletes every size. Without `R2_*` the admin works but upload is disabled.
+- **Reminders (decision A).** `/admin/sap-qua-han` lists overdue + due within 14 days; the daily
+  cron `/api/cron/reverify` emails each editor their areas on Mondays (Saigon), once per week.
+
+CI (`db`, MariaDB) runs `scripts/admin-e2e.mjs` against the built server with a fake S3
+(`scripts/fake-s3.mjs`) and publishes admin screenshots to `ci/admin-screenshots-pr-<n>`.
+
 ### Hostinger (hPanel)
 
 - Node version: 22
@@ -69,5 +96,6 @@ Client components import card shapes from `src/lib/cards.ts`, never from `lib/re
   demo data) are applied when the app starts — see `src/db/boot.ts`. While the DB holds only demo
   restaurants, the same flag also fills in demo fields added later (photos, features, amenities). Look for `[db]` lines in the
   runtime log after each deploy. Production leaves both unset.
+- Admin env: `ADMIN_BOOTSTRAP_EMAILS`, `ADMIN_SETUP_CODE`, `ADMIN_SECRET_KEY`, `REQUIRE_ADMIN_2FA=0` (staging), `R2_*`, `SMTP_*`.
 - Cron (hPanel → Advanced → Cron Jobs), daily:
   `curl -fsS -H "x-cron-secret: $CRON_SECRET" https://<domain>/api/cron/reverify`
