@@ -9,6 +9,11 @@ export const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://eatin
 
 /** Minimum verified restaurants before a dish/district landing page may be indexed (thin-content guard). */
 export const MIN_INDEXABLE = 3;
+/**
+ * District landings ("Ăn gì ở Quận 1?") answer a broad query: a handful of restaurants reads as
+ * thin content, so they wait for more verified restaurants before being indexed.
+ */
+export const MIN_INDEXABLE_DISTRICT = 10;
 
 const DAY_SCHEMA = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -66,6 +71,17 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       name: it.name,
       item: `${siteUrl()}${it.path}`,
     })),
+  };
+}
+
+/** Ordered list of restaurant pages (district landing). */
+export function itemListJsonLd(name: string, items: { name: string; path: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name,
+    numberOfItems: items.length,
+    itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, url: `${siteUrl()}${it.path}` })),
   };
 }
 

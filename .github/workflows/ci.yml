@@ -213,6 +213,8 @@ jobs:
           page '/quan/bun-bo-ganh-me-hoa' 'Bún bò CI từ DB'
           page '/mon/bun-bo' 'Bún bò CI từ DB'
           page '/khu-vuc/quan-1' 'Bún bò CI từ DB'
+          page '/khu-vuc/quan-1' 'Ăn gì ở Quận 1?'
+          page '/khu-vuc/quan-1' '"@type":"ItemList"'
           page '/api/restaurants?slugs=bun-bo-ganh-me-hoa' 'Bún bò CI từ DB'
           page '/sitemap.xml' '/quan/bun-bo-ganh-me-hoa'
           # Drafts stay hidden.

@@ -13,6 +13,7 @@ const ROUTES = [
   ['03-tim-kiem', '/tim-kiem?q=' + encodeURIComponent('thèm món nước gần đây dưới 50k')],
   ['04-quan', '/quan/bun-bo-hue-o-xuan'],
   ['05-mon', '/mon/bun-bo'],
+  ['05b-khu-vuc', '/khu-vuc/quan-1'],
   ['06-da-luu', '/da-luu'],
   ['07-toi', '/toi'],
   ['08-chinh-sach', '/chinh-sach-bao-mat'],
