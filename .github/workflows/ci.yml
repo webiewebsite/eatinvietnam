@@ -248,6 +248,31 @@ jobs:
       - name: Admin end-to-end (#8)
         if: matrix.engine == 'mariadb:11.8'
         run: BASE_URL=http://localhost:3100 node scripts/admin-e2e.mjs || { tail -n 80 server.log; tail -n 40 s3.log; exit 1; }
+      # Issue #48: ops sheet → drafts. Dry run, apply, re-run (no duplicates); nothing becomes public.
+      - name: Import restaurant sheet (#48)
+        if: matrix.engine == 'mariadb:11.8'
+        run: |
+          imp() { npm run --silent db:import -- tests/fixtures/import-sample.xlsx --as admin@ci.test "$@" > out.txt 2>&1 || { cat out.txt; exit 1; }; cat out.txt; }
+          imp --report dry.csv && grep -q 'Sẽ tạo: 3 · đã có: 0 · lỗi: 2' out.txt
+          imp --apply --report apply.csv && grep -q 'Đã tạo: 3 · đã có: 0 · lỗi: 2' out.txt
+          imp --apply --report again.csv && grep -q 'Đã tạo: 0 · đã có: 3 · lỗi: 2' out.txt
+          head -c 3 apply.csv | od -An -tx1 | grep -q 'ef bb bf'
+          grep -q 'Thiếu tên quán' apply.csv
+          node -e "
+            const m=require('mysql2/promise');
+            (async()=>{const c=await m.createConnection(process.env.DATABASE_URL);
+            const [r]=await c.query(\"SELECT slug,status,highlight,ST_Y(location) lat FROM restaurants WHERE name LIKE '%(CI)' ORDER BY id\");
+            const s=Object.fromEntries(r.map(x=>[x.slug,x]));
+            if(r.length!==3)throw new Error('expected 3 imported rows: '+JSON.stringify(r));
+            if(s['banh-xeo-co-ut-ci']?.status!=='pending')throw new Error('complete+verified row should be pending');
+            if(s['com-tam-thu-nghiem-ci']?.status!=='draft'||s['com-tam-thu-nghiem-ci'].highlight!=='')throw new Error('ShopeeFood row: draft, empty highlight');
+            if(Math.abs(s['com-tam-thu-nghiem-ci'].lat-10.783331)>1e-6)throw new Error('placeholder coordinates expected');
+            const [a]=await c.query(\"SELECT COUNT(*) n FROM audit_log WHERE action='import'\");
+            if(Number(a[0].n)!==3)throw new Error('3 import audit rows expected');
+            await c.end();})().catch(e=>{console.error(e);process.exit(1)})"
+          for s in banh-xeo-co-ut-ci com-tam-thu-nghiem-ci quan-thao-dien-ci; do
+            test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3100/quan/$s)" = 404 || { echo "::error::imported $s is public"; exit 1; }
+          done
       - name: Admin screenshots (390px / 1280px)
         if: matrix.engine == 'mariadb:11.8'
         run: |

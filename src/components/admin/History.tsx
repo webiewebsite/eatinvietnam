@@ -6,6 +6,7 @@ const ACTION: Record<string, string> = {
   update: 'sửa',
   status: 'đổi trạng thái',
   verify: 'xác minh',
+  import: 'nhập từ file',
   photo_add: 'thêm ảnh',
   photo_update: 'sửa ảnh',
   photo_delete: 'xóa ảnh',
@@ -51,6 +52,7 @@ function summary(action: string, diff: unknown): string {
     return s ? `${s[0]} → ${s[1]}${d.method ? ` (${String(d.method)})` : ''}` : '';
   }
   if (action.startsWith('photo')) return typeof d.alt === 'string' ? `"${d.alt}"` : '';
+  if (action === 'import') return typeof d.note === 'string' ? d.note : '';
   return Object.keys(d)
     .map((k) => FIELD[k] ?? k)
     .join(', ');
@@ -67,7 +69,7 @@ export function History({ entries }: { entries: { id: number; action: string; di
           {entries.map((e) => (
             <li key={e.id} className="border-l-2 border-line pl-2">
               <span className="font-semibold">{e.userName ?? 'Hệ thống'}</span> {ACTION[e.action] ?? e.action}
-              {summary(e.action, e.diff) && <span className="text-muted"> · {summary(e.action, e.diff)}</span>}
+              {summary(e.action, e.diff) && <span className="whitespace-pre-line text-muted"> · {summary(e.action, e.diff)}</span>}
               <span className="block text-[12px] text-muted">{viDateTime(e.createdAt)}</span>
             </li>
           ))}

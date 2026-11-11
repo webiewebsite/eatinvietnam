@@ -365,7 +365,12 @@ export function revalidateRestaurant(...versions: ({ slug: string; dishes: strin
 
 const pub = (r: AdminRestaurant | null) => (r ? { slug: r.slug, dishes: r.input.dishes, district: r.input.district } : null);
 
-export async function saveRestaurant(user: AdminUser, id: number | null, input: RestaurantInputT): Promise<{ id: number; slug: string }> {
+export async function saveRestaurant(
+  user: AdminUser,
+  id: number | null,
+  input: RestaurantInputT,
+  opts: { revalidate?: boolean } = {},
+): Promise<{ id: number; slug: string }> {
   const db = getDb();
   const before = id ? await getAdminRestaurant(id) : null;
   if (id && !before) fail(404, 'not_found', 'Không tìm thấy quán.');
@@ -498,11 +503,18 @@ export async function saveRestaurant(user: AdminUser, id: number | null, input: 
     return rid;
   });
 
-  revalidateRestaurant(pub(before), { slug, dishes, district: input.district });
+  // The file import (#48) runs outside Next and only writes drafts: nothing public to refresh.
+  if (opts.revalidate !== false) revalidateRestaurant(pub(before), { slug, dishes, district: input.district });
   return { id: savedId, slug };
 }
 
-export async function setRestaurantStatus(user: AdminUser, id: number, change: StatusInputT, now = new Date()): Promise<{ status: string }> {
+export async function setRestaurantStatus(
+  user: AdminUser,
+  id: number,
+  change: StatusInputT,
+  now = new Date(),
+  opts: { revalidate?: boolean } = {},
+): Promise<{ status: string }> {
   const db = getDb();
   const current = await getAdminRestaurant(id);
   if (!current) return fail(404, 'not_found', 'Không tìm thấy quán.');
@@ -540,6 +552,6 @@ export async function setRestaurantStatus(user: AdminUser, id: number, change: S
       diff: { status: [current.status, set.status], ...(change.action === 'verify' ? { method: change.method } : {}) },
     });
   });
-  revalidateRestaurant(pub(current));
+  if (opts.revalidate !== false) revalidateRestaurant(pub(current));
   return { status: set.status! };
 }

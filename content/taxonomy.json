@@ -27,6 +27,7 @@
   ],
   "districts": [
     { "slug": "quan-1", "label": "Quận 1", "short": "Q1", "keywords": ["quan 1", "q1", "q 1"] },
+    { "slug": "quan-2", "label": "Quận 2", "short": "Q2", "keywords": ["quan 2", "q2", "q 2", "thao dien"] },
     { "slug": "quan-3", "label": "Quận 3", "short": "Q3", "keywords": ["quan 3", "q3", "q 3"] },
     { "slug": "quan-4", "label": "Quận 4", "short": "Q4", "keywords": ["quan 4", "q4", "q 4"] }
   ]

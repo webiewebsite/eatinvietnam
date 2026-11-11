@@ -82,6 +82,16 @@ restaurant's edit page. Code: `src/lib/admin/`, `app/admin/`, `app/api/admin/`.
 - **Reminders (decision A).** `/admin/sap-qua-han` lists overdue + due within 14 days; the daily
   cron `/api/cron/reverify` emails each editor their areas on Mondays (Saigon), once per week.
 
+- **Importing the ops sheet (#48).** `npm run db:import -- <file.xlsx> --as <admin email>` reads
+  sheet "Quán" of the template and prints what it would do (works without `DATABASE_URL`, minus the
+  duplicate check); add `--apply` to write. A CSV report per row (what is still missing to verify,
+  warnings) is written next to the file. Rows become **draft** (complete + verified in the file →
+  **pending**), never verified. Re-running skips restaurants that already exist (same
+  ShopeeFood/GrabFood link, or same name + address). Missing coordinates get a placeholder pin and
+  ShopeeFood menus land in the group "Cần kiểm tra (từ ShopeeFood)"; both block "Xác minh" until an
+  editor fixes them (`src/lib/admin/placeholders.ts`). The row's internal note is in the
+  restaurant's history. Run it from a machine whitelisted in Remote MySQL, staging first.
+
 CI (`db`, MariaDB) runs `scripts/admin-e2e.mjs` against the built server with a fake S3
 (`scripts/fake-s3.mjs`) and publishes admin screenshots to `ci/admin-screenshots-pr-<n>`.
 

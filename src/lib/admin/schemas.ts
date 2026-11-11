@@ -5,6 +5,7 @@
 import { z } from 'zod';
 import { DISHES } from '@/lib/taxonomy';
 import vibes from '@content/vibes.json';
+import { UNCHECKED_MENU_GROUP, isPlaceholderCoords } from './placeholders';
 
 const DISH_SLUGS = DISHES.map((d) => d.slug) as [string, ...string[]];
 const VIBE_SLUGS = vibes.vibes.map((v) => v.slug) as [string, ...string[]];
@@ -131,12 +132,20 @@ export const StatusInput = z.discriminatedUnion('action', [
 export type StatusInputT = z.infer<typeof StatusInput>;
 
 /** What a restaurant still lacks before it can be verified (published). Empty = ready. */
-export function missingForPublish(r: Pick<RestaurantInputT, 'dishes' | 'hours' | 'venueType' | 'address'>): string[] {
+export function missingForPublish(
+  r: Pick<RestaurantInputT, 'dishes' | 'hours' | 'venueType' | 'address' | 'lat' | 'lng' | 'highlight' | 'menu'>,
+): string[] {
   const missing: string[] = [];
   if (!r.dishes.length) missing.push('ít nhất 1 món');
   if (!r.hours.length) missing.push('giờ mở cửa');
   if (!r.venueType) missing.push('loại quán');
   if (!r.address) missing.push('địa chỉ');
+  if (!r.highlight.trim()) missing.push('điểm nổi bật');
+  // Markers left by the file import (#48): an editor must replace them first.
+  if (isPlaceholderCoords(r)) missing.push('tọa độ thật (đang là tọa độ tạm khi nhập file)');
+  if (r.menu.some((m) => m.group === UNCHECKED_MENU_GROUP)) {
+    missing.push(`kiểm tra thực đơn nhóm "${UNCHECKED_MENU_GROUP}" (đổi tên nhóm hoặc xóa món)`);
+  }
   return missing;
 }
 
