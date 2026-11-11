@@ -117,7 +117,7 @@ export default async function DistrictPage({ params }: Props) {
                   <li key={dish.slug}>
                     <Link
                       href={`${path}/${dish.slug}`}
-                      className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface pr-3.5 pl-1.5 text-[14px] font-semibold"
+                      className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface pr-3.5 pl-1.5 text-[14px] font-semibold whitespace-nowrap"
                     >
                       <DishBadge slug={dish.slug} size={30} />
                       {dish.label}
