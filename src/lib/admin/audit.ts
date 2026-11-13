@@ -10,6 +10,7 @@ export type AuditAction =
   | 'update'
   | 'status'
   | 'verify'
+  | 'import'
   | 'photo_add'
   | 'photo_update'
   | 'photo_delete'

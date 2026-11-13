@@ -116,8 +116,9 @@ describe('RestaurantInput', () => {
   });
   it('knows what is missing before publishing', () => {
     const r = RestaurantInput.parse(base);
-    expect(missingForPublish(r)).toEqual(['ít nhất 1 món', 'giờ mở cửa']);
-    expect(missingForPublish({ ...r, dishes: ['pho'], hours: [{ day: 0, open: '06:00', close: '10:00' }] })).toEqual([]);
+    expect(missingForPublish(r)).toEqual(['ít nhất 1 món', 'giờ mở cửa', 'điểm nổi bật']);
+    const ready = { ...r, dishes: ['pho'], hours: [{ day: 0, open: '06:00', close: '10:00' }], highlight: 'Nước dùng thanh' };
+    expect(missingForPublish(ready)).toEqual([]);
   });
   it('verify needs a method', () => {
     expect(StatusInput.safeParse({ action: 'verify' }).success).toBe(false);
