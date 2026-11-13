@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { ChevronDown, Map as MapIcon } from 'lucide-react';
+import { Map as MapIcon } from 'lucide-react';
 import { clsx } from 'clsx';
+import { FaqList } from '@/components/FaqList';
 import { DishBadge } from '@/components/icons/food/FoodIcon';
 import { RestaurantPhoto } from '@/components/RestaurantPhoto';
 import { TrackedLink } from '@/components/TrackedLink';
@@ -155,22 +156,7 @@ export function DishLanding({ dish, district, hits }: { dish: Dish; district?: s
         )}
       </section>
 
-      <section aria-labelledby="faq" className="mt-7">
-        <h2 id="faq" className="font-display text-section font-bold">
-          Hỏi nhanh
-        </h2>
-        <div className="mt-2 divide-y divide-line rounded-card bg-surface px-3 shadow-card">
-          {faq.map((f, i) => (
-            <details key={f.q} open={i === 0} className="group py-1">
-              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 text-[15px] font-semibold">
-                {f.q}
-                <ChevronDown aria-hidden className="size-4 shrink-0 transition-transform group-open:rotate-180" />
-              </summary>
-              <p className="pb-3 text-[14px] text-muted">{f.a}</p>
-            </details>
-          ))}
-        </div>
-      </section>
+      <FaqList faq={faq} />
     </>
   );
 }

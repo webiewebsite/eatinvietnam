@@ -1,0 +1,15 @@
+{
+  "$comment": "Editorial copy for district landing pages /khu-vuc/<slug> (#49). Draft by dev, the ops/editorial team owns and rewrites it. intro = paragraph under the title; description (optional) = meta description, otherwise generated from the numbers; faq (optional) = extra editorial questions, shown after the questions generated from the data. Answers starting with '[' are treated as unwritten and hidden.",
+  "quan-1": {
+    "intro": "Trung tâm Sài Gòn, quanh chợ Bến Thành, phố đi bộ Nguyễn Huệ và khu Tân Định. Có đủ từ xe đẩy vỉa hè, quán cơm tấm, phở lâu năm đến nhà hàng đón khách du lịch; giá ở các tuyến phố đông khách thường cao hơn trong hẻm."
+  },
+  "quan-2": {
+    "intro": "Khu Thảo Điền, An Phú bên kia sông Sài Gòn: nhiều quán cà phê sân vườn, nhà hàng nước ngoài và quán Việt quen thuộc với cả khách quốc tế."
+  },
+  "quan-3": {
+    "intro": "Nhiều hẻm nhỏ và nhà phố cũ quanh Hồ Con Rùa, Võ Văn Tần, Nguyễn Thượng Hiền, nơi người Sài Gòn ăn sáng, ăn trưa văn phòng và ngồi cà phê. Nhiều quán bình dân nằm sâu trong hẻm, nên mở chỉ đường trước khi đi."
+  },
+  "quan-4": {
+    "intro": "Nổi tiếng với phố ốc Vĩnh Khánh, đông từ chiều tối tới khuya, cùng nhiều quán hải sản, lẩu và đồ nhậu giá dễ chịu, chỉ cách trung tâm Quận 1 một cây cầu."
+  }
+}
